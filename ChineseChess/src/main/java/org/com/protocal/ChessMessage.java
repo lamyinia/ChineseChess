@@ -1,6 +1,8 @@
 package org.com.protocal;
 
-public class ChessMessage {
+import java.io.Serializable;
+
+public class ChessMessage implements Serializable {
     private Object message;
     private Type type;
     private String sender;
@@ -10,16 +12,14 @@ public class ChessMessage {
 
     public enum Type {
         LOGIN,
+        OFFLINE,
         REGISTER,
         FORGET,
-        ACQUIRE_ONLINE,
+        ACQUIRE_PLAYER,
         FIGHT,
-        FIGHT_SUCCESS,
         MOVE,
         EAT,
-        PEACE,
-        PEACE_SUCCESS,
-        PEACE_FAILURE,
+        DRAW,
         SUCCESS,
         FAILURE,
         GIVE_UP,
@@ -39,6 +39,22 @@ public class ChessMessage {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public String getSenderGroup() {
+        return senderGroup;
+    }
+
+    public void setSenderGroup(String senderGroup) {
+        this.senderGroup = senderGroup;
+    }
+
+    public String getReceiverGroup() {
+        return receiverGroup;
+    }
+
+    public void setReceiverGroup(String receiverGroup) {
+        this.receiverGroup = receiverGroup;
     }
 
     public Object getMessage() {

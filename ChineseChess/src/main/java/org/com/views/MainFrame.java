@@ -1,5 +1,7 @@
 package org.com.views;
 
+import org.com.protocal.ChessMessage;
+
 import javax.swing.*;
 import java.awt.*;
 

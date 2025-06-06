@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class GamePanel extends JPanel {
-    String VIEW_BASE_PATH = "files/img2/";
+    String VIEW_BASE_PATH = "files/img/";
     String VIEW_CHESS_BOARD = VIEW_BASE_PATH + "chessboard.jpg";
     private BufferedImage boardImage; // 使用BufferedImage便于获取尺寸
 

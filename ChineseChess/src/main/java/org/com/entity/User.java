@@ -1,8 +1,15 @@
 package org.com.entity;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String account;
     private String password;
+
+    public User(String account, String password) {
+        this.account = account;
+        this.password = password;
+    }
 
     public String getAccount() {
         return account;
