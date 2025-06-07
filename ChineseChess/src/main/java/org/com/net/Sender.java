@@ -1,7 +1,7 @@
 package org.com.net;
 
 import org.com.protocal.ChessMessage;
-import org.com.tools.ChessRoomTool;
+import org.com.tools.SocketTool;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -28,13 +28,13 @@ public class Sender {
     // 发送必须有响应
     public ChessMessage send(ChessMessage message) throws IOException {
         try {
-            ChessRoomTool.sendMessage(socket, message);
-            ChessMessage response = ChessRoomTool.receiveMessage(socket);
+            SocketTool.sendMessage(socket, message);
+            ChessMessage response = SocketTool.receiveMessage(socket);
             return response;
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } finally {
-            ChessRoomTool.closeSocket(socket); // 确保最终关闭Socket
+            SocketTool.closeSocket(socket); // 确保最终关闭Socket
         }
     }
     // 发送必须没有响应
@@ -43,7 +43,7 @@ public class Sender {
             output.writeObject(message);
             output.flush();
         } finally {
-            ChessRoomTool.closeSocket(socket);
+            SocketTool.closeSocket(socket);
         }
     }
 }

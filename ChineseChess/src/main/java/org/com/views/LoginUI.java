@@ -4,7 +4,8 @@ import org.com.entity.User;
 import org.com.net.ChessClient;
 import org.com.net.Sender;
 import org.com.protocal.ChessMessage;
-import org.com.tools.ChessRoomTool;
+import org.com.tools.GameRoomTool;
+import org.com.tools.SocketTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,17 +18,20 @@ import java.io.IOException;
     延迟实现的任务：
     - 窗口关闭时发送下线通知
  */
-public class LoginFrame extends JFrame implements ActionListener {
-    private static final Logger logger = LoggerFactory.getLogger(LoginFrame.class);
+
+/**
+ * @author lanye
+ * @date 2025/06/07
+ */
+public class LoginUI extends JFrame implements ActionListener {
+    private static final Logger logger = LoggerFactory.getLogger(LoginUI.class);
     private JTextField accountText;
     private JTextField passwordText;
-    private String mainServerIP = "127.0.0.1";
-    private int mainServerPort = 65140;
     ChessClient clientServer;
 
     HallRoom hallRoom;
 
-    LoginFrame(){
+    LoginUI(){
         clientServer = new ChessClient();
         new Thread(clientServer).start();
 
@@ -101,12 +105,12 @@ public class LoginFrame extends JFrame implements ActionListener {
         String account = accountText.getText();
         String password = passwordText.getText();
         if ("".equals(account) || "".equals(password)){
-            ChessRoomTool.showErrorBox("账号密码不能为空");
+            SocketTool.showErrorBox("账号密码不能为空");
             return;
         }
 
         Sender sender = new Sender();
-        sender.connect(mainServerIP, mainServerPort,1000);
+        sender.connect(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT,1000);
 
         ChessMessage message = new ChessMessage(new Object[] {new User(account, password), clientServer.getPort()}, ChessMessage.Type.LOGIN, null, null);
         ChessMessage response = sender.send(message);
@@ -114,16 +118,17 @@ public class LoginFrame extends JFrame implements ActionListener {
         if (response.getType() == ChessMessage.Type.SUCCESS){
             logger.info("登录成功");
             dispose();
-            hallRoom = new HallRoom(new User(account, password));
+            hallRoom = new HallRoom(new User(account, password), clientServer);
             clientServer.setHallRoom(hallRoom);
         } else {
-            ChessRoomTool.showErrorBox("账号密码错误");
+            logger.info("登录失败");
+            SocketTool.showErrorBox((String)response.getMessage());
         }
     }
     private void register(){
 
     }
     public static void main(String[] args) {
-        new LoginFrame();
+        new LoginUI();
     }
 }

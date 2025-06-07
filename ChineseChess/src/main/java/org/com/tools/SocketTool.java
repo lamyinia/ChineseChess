@@ -11,8 +11,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class ChessRoomTool {
-    private static final Logger logger = LoggerFactory.getLogger(ChessRoomTool.class);
+public class SocketTool {
+    private static final Logger logger = LoggerFactory.getLogger(SocketTool.class);
 
     public static String showErrorBox(String message) {
         JOptionPane.showMessageDialog(null, message, "错误", JOptionPane.ERROR_MESSAGE);

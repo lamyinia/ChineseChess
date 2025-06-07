@@ -4,11 +4,21 @@
 
 
 
+Server处理监听，Sender处理响应
+
 细节重构：
 
 选择时是按照圆来选择
 
 确定对战
+
+
+
+长连接方案：
+
+login时顺带serverport
+
+login成功再处理长连接
 
 
 
@@ -47,6 +57,14 @@ UI渲染和游戏逻辑分离
     b) 玩家掉线（等待超时后）
     c) 玩家主动退出
 
+---
+
+---
+
+---
+
+
+
 
 
 #### 游戏客户端部分
@@ -60,7 +78,7 @@ UI渲染和游戏逻辑分离
 
 
 
-![chessboard](D:\git-project\ChineseChess\ChineseChess\files\img\chessboard.jpg)
+![](D:\git-project\ChineseChess\ChineseChess\files\img\chessboard-analysis.jpg)
 
 
 
@@ -136,3 +154,13 @@ UI自适应
 匹配模式
 
 redis优化
+
+
+
+#### 主要思路
+
+MainServer新开线程GameThread
+
+#### 重大bug
+
+- 存客户端socket 的 ip 时参数写错了，写成了自己服务器socket的ip

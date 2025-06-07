@@ -7,15 +7,13 @@ public class ChessMessage implements Serializable {
     private Type type;
     private String sender;
     private String receiver;
-    private String senderGroup;
-    private String receiverGroup;
 
     public enum Type {
         LOGIN,
         OFFLINE,
         REGISTER,
         FORGET,
-        ACQUIRE_PLAYER,
+        ACQUIRE_HALL_LIST,
         FIGHT,
         MOVE,
         EAT,
@@ -36,43 +34,19 @@ public class ChessMessage implements Serializable {
     public Type getType() {
         return type;
     }
-
     public void setType(Type type) {
         this.type = type;
     }
-
-    public String getSenderGroup() {
-        return senderGroup;
+    public String getSender() {
+        return sender;
     }
-
-    public void setSenderGroup(String senderGroup) {
-        this.senderGroup = senderGroup;
+    public String getReceiver() {
+        return receiver;
     }
-
-    public String getReceiverGroup() {
-        return receiverGroup;
-    }
-
-    public void setReceiverGroup(String receiverGroup) {
-        this.receiverGroup = receiverGroup;
-    }
-
     public Object getMessage() {
         return message;
     }
-
     public void setMessage(Object message) {
         this.message = message;
-    }
-    @Override
-    public String toString() {
-        return "ChessMessage{" +
-                "message=" + message +
-                ", type=" + type +
-                ", sender='" + sender + '\'' +
-                ", receiver='" + receiver + '\'' +
-                ", senderGroup='" + senderGroup + '\'' +
-                ", receiverGroup='" + receiverGroup + '\'' +
-                '}';
     }
 }

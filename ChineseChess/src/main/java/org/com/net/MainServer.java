@@ -2,7 +2,8 @@ package org.com.net;
 
 import org.com.entity.User;
 import org.com.protocal.ChessMessage;
-import org.com.tools.ChessRoomTool;
+import org.com.tools.GameRoomTool;
+import org.com.tools.SocketTool;
 import org.com.tools.SQLTool;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainServer extends Server {
     public class Client {
@@ -45,13 +47,57 @@ public class MainServer extends Server {
             this.port = port;
         }
     }
+    private static class GameThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
 
-    ConcurrentHashMap<String, User> userTable = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, Client> onlineTable = new ConcurrentHashMap<>();
+        GameThreadFactory() {
+            group = Thread.currentThread().getThreadGroup();
+            namePrefix = "game-server-pool-" + poolNumber.getAndIncrement() + "-thread-";
+        }
+
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
+            thread.setDaemon(false);
+            thread.setPriority(Thread.NORM_PRIORITY);
+            return thread;
+        }
+    }
+    private class GameRejectedPolicy implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            if (r instanceof GameServer){
+                GameServer game = (GameServer) r;
+                logger.error("游戏服务器线程池已满，拒绝新游戏");
+            }
+        }
+    }
+
+
+    private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
+    private static final int MAX_POOL_SIZE = 50;;
+
+
+    private ConcurrentHashMap<String, User> userTable = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Client> onlineTable = new ConcurrentHashMap<>();
+    private ConcurrentHashMap <String, GameServer> activeGames = new ConcurrentHashMap<>();
+    private ExecutorService gameThreadPool;
 
     MainServer(int port) throws IOException {
         serverName = "主服务器";
         logger = LoggerFactory.getLogger(MainServer.class);
+
+        gameThreadPool = new ThreadPoolExecutor(
+                CORE_POOL_SIZE,  // 核心线程数
+                MAX_POOL_SIZE,   // 最大线程数
+                60L, TimeUnit.SECONDS, // 空闲线程存活时间
+                new LinkedBlockingQueue<>(100), // 工作队列
+                new GameThreadFactory(), // 自定义线程工厂
+                new GameRejectedPolicy() // 自定义拒绝策略
+        );
+        logger.info("主服务器的核心线程数量是{}，最大线程数量是{}", CORE_POOL_SIZE, MAX_POOL_SIZE);
 
         initPort(port);
         initData();
@@ -77,7 +123,29 @@ public class MainServer extends Server {
         }
     }
 
+    @Override
+    protected void handle(Socket affair, ChessMessage message) {
+
+        switch (message.getType()){
+            case LOGIN:
+                loginHandle(affair, message);
+                break;
+            case OFFLINE:
+                offlineHandle();
+                break;
+            case ACQUIRE_HALL_LIST:
+                HallListHandle();
+                break;
+            case FIGHT:
+                openGameRoomHandle(affair, message);
+                break;
+            default:
+                break;
+        }
+    }
     private void loginHandle(Socket affair, ChessMessage message){
+        logger.info("客户端登录请求处理");
+
         ChessMessage response = new ChessMessage();
         Object[] objects = (Object[]) message.getMessage();
         User user = (User) objects[0];
@@ -98,7 +166,7 @@ public class MainServer extends Server {
         }
 
         try {
-            ChessRoomTool.sendMessage(affair, response);
+            SocketTool.sendMessage(affair, response);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -107,48 +175,49 @@ public class MainServer extends Server {
     private void offlineHandle(){
 
     }
-    private void openRoomHandle(){
 
+    private void openGameRoomHandle(Socket affair, ChessMessage message){
+        logger.info("客户端房间请求处理");
+
+        String player1 = message.getSender();
+        String player2 = message.getReceiver();
+        Client client1 = onlineTable.get(player1);
+        Client client2 = onlineTable.get(player2);
+        Sender sender = new Sender(client2.getIp(), client2.getPort(), 1000);
+
+        try {
+            boolean separation = System.currentTimeMillis()%2 == 1;
+            GameServer gameServer = new GameServer(client1, client2, separation);
+            message.setMessage(new Object[]{GameRoomTool.MAIN_SERVER_IP, gameServer.getGamePort(), separation});
+
+            sender.sendOnly(message);
+            SocketTool.sendMessage(affair, new ChessMessage(new Object[]{GameRoomTool.MAIN_SERVER_IP, gameServer.getGamePort(), !separation},
+                    ChessMessage.Type.SUCCESS, null, null));
+
+            gameThreadPool.submit(gameServer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-    private void playerListHandle(){
-        logger.info("全局更新在线用户");
+    private void HallListHandle(){
+        logger.info("全局更新客户端的在线用户");
         Vector<String> items = new Vector<>();
         onlineTable.forEach((u, _) -> items.add(u));
-        ChessMessage response = new ChessMessage(items, ChessMessage.Type.ACQUIRE_PLAYER, null, null);
+        ChessMessage response = new ChessMessage(items, ChessMessage.Type.ACQUIRE_HALL_LIST, null, null);
         onlineTable.forEach((account, client) -> {
             Sender sender = new Sender(client.getIp(), client.getPort(), 1000);
             try {
-                logger.info("发送给 " + account);
-                ChessMessage useless = sender.send(response);
+                logger.info("更新用户 " + account + " 的大厅列表");
+                sender.sendOnly(response);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    @Override
-    protected void handle(Socket affair, ChessMessage message) {
-
-        switch (message.getType()){
-            case LOGIN:
-                loginHandle(affair, message);
-                break;
-            case OFFLINE:
-                offlineHandle();
-                break;
-            case ACQUIRE_PLAYER:
-                playerListHandle();
-                break;
-            case FIGHT:
-                openRoomHandle();
-                break;
-            default:
-                break;
-        }
-    }
 
     public static void main(String[] args) throws IOException {
-        int targetPort = 65140;
+        final int targetPort = 65140;
         new MainServer(targetPort);
     }
 }

@@ -1,12 +1,13 @@
 package org.com.net;
 
 import org.com.protocal.ChessMessage;
-import org.com.tools.ChessRoomTool;
+import org.com.tools.SocketTool;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /* 监听，多线程，先收再发 */
 public abstract class Server {
@@ -27,15 +28,18 @@ public abstract class Server {
     }
 
     protected String serverName;
-    protected ServerSocket socket;
     protected Logger logger;
+    protected volatile ServerSocket socket;
+    protected final AtomicBoolean running = new AtomicBoolean(false);
 
     public Server(){}
     protected abstract void handle(Socket affair, ChessMessage message);
 
     protected void listen() throws IOException {
-        logger.info(serverName + " 开始监听");
-        while (true){
+        logger.info(serverName + ",端口在" + socket.getLocalPort() + " 开始监听");
+        running.set(true);
+
+        while (running.get()){
             Socket affair = socket.accept();
             new Thread(new HandleThread(affair)).start();
         }
@@ -43,12 +47,12 @@ public abstract class Server {
     private void handleMessage(Socket affair) throws IOException {
         ChessMessage message;
         try {
-            message = ChessRoomTool.receiveMessage(affair);
+            message = SocketTool.receiveMessage(affair);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         handle(affair, message);
-        ChessRoomTool.closeSocket(affair);
+        SocketTool.closeSocket(affair);
     }
     int findFreeServerSocket(int i){
         if (i >= 65536) return -1;
@@ -59,5 +63,4 @@ public abstract class Server {
             return findFreeServerSocket(i+1);
         }
     }
-
 }

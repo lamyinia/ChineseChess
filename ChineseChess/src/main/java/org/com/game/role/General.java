@@ -1,0 +1,13 @@
+package org.com.game.role;
+
+import java.awt.*;
+
+public class General extends Chess {
+    public General(String name, boolean group, Point point){
+        super(name, group, point);
+    }
+    @Override
+    public boolean isAbleMove() {
+        return false;
+    }
+}
