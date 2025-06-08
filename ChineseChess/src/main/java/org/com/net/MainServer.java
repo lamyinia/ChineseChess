@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MainServer extends Server {
     public class Client {
         private User user;
-        String ip;
-        int port;
+        private String ip;
+        private int port;
         public Client(User user, String ip, int port) {
             this.user = user;
             this.ip = ip;
@@ -77,7 +77,7 @@ public class MainServer extends Server {
 
 
     private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
-    private static final int MAX_POOL_SIZE = 50;;
+    private static final int MAX_POOL_SIZE = 50;
 
     private ConcurrentHashMap<String, User> userTable = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Client> onlineTable = new ConcurrentHashMap<>();
@@ -129,6 +129,9 @@ public class MainServer extends Server {
             case LOGIN:
                 loginHandle(affair, message);
                 break;
+            case ONLINE:
+                onlineHandle(affair, message);
+                break;
             case OFFLINE:
                 offlineHandle(message);
                 break;
@@ -159,7 +162,7 @@ public class MainServer extends Server {
             response.setMessage("改账号已经登录了");
             response.setType(ChessMessage.Type.FAILURE);
         } else {
-            onlineTable.put(account, new Client(user, affair.getInetAddress().getHostAddress(), affairPort));
+            onlineHandle(affair, message);
             logger.info("上线用户、地址及端口" + account + " " + affair.getInetAddress().getHostAddress() + " " + affairPort);
             response.setType(ChessMessage.Type.SUCCESS);
         }
@@ -169,7 +172,18 @@ public class MainServer extends Server {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+
+    /**
+     * @param affair 根据 socket 找到它的 ip
+     * @param message 传 Object[User, 服务器的端口]
+     */
+    private void onlineHandle(Socket affair, ChessMessage message){
+        Object[] objects = (Object[]) message.getMessage();
+        User user = (User) objects[0];
+        int affairPort = (int) objects[1];
+        onlineTable.put(user.getAccount(), new Client(user, affair.getInetAddress().getHostAddress(), affairPort));
     }
     private void offlineHandle(ChessMessage message){
         logger.info("下线请求处理");
@@ -186,14 +200,13 @@ public class MainServer extends Server {
         String player2 = message.getReceiver();
         Client client1 = onlineTable.get(player1);
         Client client2 = onlineTable.get(player2);
-        Sender sender = new Sender(client2.getIp(), client2.getPort(), 1000);
 
         try {
-            boolean separation = System.currentTimeMillis()%2 == 1;
+            boolean separation = System.currentTimeMillis()%2 == 1;  // true 时 player1 是红方
             GameServer gameServer = new GameServer(client1, client2, separation);
             message.setMessage(new Object[]{GameRoomTool.MAIN_SERVER_IP, gameServer.getGamePort(), separation});
 
-            sender.sendOnly(message);
+            new Sender(client2.getIp(), client2.getPort(), 1000).sendOnly(message);
             SocketTool.sendMessage(affair, new ChessMessage(new Object[]{GameRoomTool.MAIN_SERVER_IP, gameServer.getGamePort(), !separation},
                     ChessMessage.Type.SUCCESS, null, null));
 

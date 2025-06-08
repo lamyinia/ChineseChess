@@ -2,6 +2,8 @@ package org.com.views;
 
 import org.com.game.role.Chess;
 import org.com.game.state.GameRecord;
+import org.com.net.Sender;
+import org.com.protocal.ChessMessage;
 import org.com.tools.GameRoomTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,22 +14,32 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.IOException;
 
 public class GameUI extends JFrame implements ActionListener {
     private static final Logger logger = LoggerFactory.getLogger(GameUI.class);
 
     private String gameServerIp;
     private int gameServerPort;
-    private GamePanel gamePanel;
+
+    public GamePanel gamePanel;
     boolean group;
+
+    String currentPlayer, opponentPlayer;
 
     JLabel hintLabel;
 
-    public GameUI(String gameServerIp, int gameServerPort, boolean group){
+    /**
+     * 服务器ip，服务器端口，你的阵营，你是谁，你的对手是谁
+     */
+    public GameUI(String gameServerIp, int gameServerPort, boolean group, String currentPlayer, String opponentPlayer){
+        logger.info("你是{}, 你在和 {} 在博弈象棋", currentPlayer, opponentPlayer);
+        setTitle("你是%s方，你的目的是击败%s方".formatted((!group ? "红" : "黑"), (!group ? "黑" : "红")));
         this.gameServerIp = gameServerIp;
         this.gameServerPort = gameServerPort;
         this.group = group;
+        this.currentPlayer = currentPlayer;
+        this.opponentPlayer = opponentPlayer;
 
         setLayout(new BorderLayout());
         setSize(1000, 850);
@@ -75,6 +87,7 @@ public class GameUI extends JFrame implements ActionListener {
         gamePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (!isMyTurn()) return;
 
                 Point targetPoint = GameRoomTool.getPointFromImage(e.getPoint());
                 logger.info("点击的 x 坐标是 {}，y 坐标是 {}", (int)targetPoint.getX(), (int)targetPoint.getY());
@@ -95,7 +108,7 @@ public class GameUI extends JFrame implements ActionListener {
     }
     private void handleFirstSelection(Chess next) {
         if (next != null) {
-            if (next.getGroup() == group) {
+            if (next.isGroup() == group) {
                 gamePanel.setSelectedChess(next);
             } else {
                 GameRoomTool.showError(this,"不能使用对方的棋子");
@@ -104,7 +117,7 @@ public class GameUI extends JFrame implements ActionListener {
     }
     private void handleSecondSelection(Chess origin, Chess next, Point target) {
         if (next != null) {
-            if (next.getGroup() == group) {
+            if (next.isGroup() == group) {
                 gamePanel.setSelectedChess(origin == next ? null : next);
             } else if (origin.isAbleMove(target, gamePanel.getGameState())) {
                 moveChess(origin, next, target, true);
@@ -120,6 +133,17 @@ public class GameUI extends JFrame implements ActionListener {
 
         gamePanel.action(record);
         gamePanel.setSelectedChess(null);
+        updateHintLabel();
+
+        try {
+            new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(record, ChessMessage.Type.MOVE,
+                    currentPlayer, opponentPlayer));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void updateHintLabel(){
+        hintLabel.setText(!gamePanel.getGameState().gameTurn.get() ? "红方回合" : "黑方回合");
     }
 
     private void decorateFunctionPanel(){
@@ -174,18 +198,59 @@ public class GameUI extends JFrame implements ActionListener {
                 break;
         }
     }
+    private boolean isMyTurn(){
+        return gamePanel.getGameState().gameTurn.get() == group;
+    }
     private void handleRepealEvent(){
-        gamePanel.repealAction();
+        try {
+            new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                    ChessMessage.Type.REPEAL_REQUEST, currentPlayer, opponentPlayer));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     private void handleDrawEvent(){
-        hintLabel.setText("黑方走");
+        try {
+            new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                    ChessMessage.Type.DRAW_REQUEST, currentPlayer, opponentPlayer));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     private void handleGiveUpEvent(){
+        try {
+            new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                    ChessMessage.Type.GIVE_UP, currentPlayer, opponentPlayer));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    public void confirmRepealRequest(){
+        int result = JOptionPane.showConfirmDialog(null, "对方请求悔棋，是否确定");
+        if (result == JOptionPane.YES_OPTION){
+            try {
+                new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                        ChessMessage.Type.REPEAL_ACTION, currentPlayer, opponentPlayer));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    public void confirmDrawRequest(){
+        int result = JOptionPane.showConfirmDialog(null, "对方求和，是否确定");
+        if (result == JOptionPane.YES_OPTION){
+            try {
+                new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                        ChessMessage.Type.DRAW_ACTION, currentPlayer, opponentPlayer));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public static void main(String[] args) {
-        new GameUI("1",1, false);
+        new GameUI("1",1, false, "1", "2");
     }
 
 }

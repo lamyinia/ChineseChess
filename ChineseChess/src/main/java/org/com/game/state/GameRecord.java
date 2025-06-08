@@ -20,19 +20,46 @@ public class GameRecord implements Serializable {
         EatenChess = eatenChess;
         Eating = eating;
     }
+
     public Point getStartPoint() {
         return startPoint;
+    }
+    public void setStartPoint(Point startPoint) {
+        this.startPoint = startPoint;
     }
     public Point getEndPoint() {
         return endPoint;
     }
+    public void setEndPoint(Point endPoint) {
+        this.endPoint = endPoint;
+    }
     public Chess getMovingChess() {
         return movingChess;
+    }
+    public void setMovingChess(Chess movingChess) {
+        this.movingChess = movingChess;
     }
     public Chess getEatenChess() {
         return EatenChess;
     }
+    public void setEatenChess(Chess eatenChess) {
+        EatenChess = eatenChess;
+    }
     public boolean isEating() {
         return Eating;
+    }
+    public void setEating(boolean eating) {
+        Eating = eating;
+    }
+
+    @Override
+    public String toString() {
+        return "GameRecord{" +
+                "startPoint=" + startPoint +
+                ", endPoint=" + endPoint +
+                ", movingChess=" + movingChess +
+                ", EatenChess=" + EatenChess +
+                ", Eating=" + Eating +
+                '}';
     }
 }

@@ -27,6 +27,7 @@ public class LoginUI extends JFrame implements ActionListener {
     private static final Logger logger = LoggerFactory.getLogger(LoginUI.class);
     private JTextField accountText;
     private JTextField passwordText;
+
     ChessClient clientServer;
 
     HallRoom hallRoom;
@@ -109,11 +110,8 @@ public class LoginUI extends JFrame implements ActionListener {
             return;
         }
 
-        Sender sender = new Sender();
-        sender.connect(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT,1000);
-
-        ChessMessage message = new ChessMessage(new Object[] {new User(account, password), clientServer.getPort()}, ChessMessage.Type.LOGIN, null, null);
-        ChessMessage response = sender.send(message);
+        ChessMessage response = new Sender(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT,1000).send
+                (new ChessMessage(new Object[] {new User(account, password), clientServer.getPort()}, ChessMessage.Type.LOGIN, null, null));
 
         if (response.getType() == ChessMessage.Type.SUCCESS){
             logger.info("登录成功");

@@ -23,7 +23,7 @@ public class HallRoom extends JFrame {
     private final DefaultListModel model;
     private final JList list;
 
-    private User currentUser;
+    public User currentUser;
     private Vector<String> onlinePlayer;//登录的用户数据
 
     ChessClient clientServer;  // 离线后能否关闭 ChessClient
@@ -73,7 +73,7 @@ public class HallRoom extends JFrame {
                                 GameRoomTool.MAIN_SERVER_PORT, 1000).send(message);
                         if (response.getType() == ChessMessage.Type.SUCCESS){
                             logger.info("{} 和 {} 对局的房间请求成功", currentUser.getAccount(), receiver);
-                            notifyGameRoom(response);
+                            notifyGameRoom(response, currentUser.getAccount(), receiver);
                         }
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -85,7 +85,7 @@ public class HallRoom extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private void HallListRequest(){
+    public void HallListRequest(){
         new Thread(() -> {
             try {
                 new Sender(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT, 1000).sendOnly(new ChessMessage(null,
@@ -95,10 +95,13 @@ public class HallRoom extends JFrame {
             }
         }).start();
     }
-    public void notifyGameRoom(ChessMessage message){
+    public void notifyGameRoom(ChessMessage message, String currentPlayer, String opponentPlayer){
         setVisible(false);
+        offLineHandle();
+
         Object[] thing = (Object[]) message.getMessage();
-        new GameUI((String)thing[0], (int)thing[1], (boolean)thing[2]);
+        GameUI gameRoom = new GameUI((String) thing[0], (int) thing[1], (boolean) thing[2], currentPlayer, opponentPlayer);
+        clientServer.setGameRoom(gameRoom);
     }
     public void addHallList(Vector<String> data){
         onlinePlayer = data;

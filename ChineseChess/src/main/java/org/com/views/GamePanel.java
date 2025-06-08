@@ -23,13 +23,11 @@ public class GamePanel extends JPanel {
     private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
 
     private BufferedImage boardImage;
+
     public volatile GameState gameState = new GameState();
     public volatile Chess selectedChess;
 
-    List<GameRecord> gameRecords = Collections.synchronizedList(new ArrayList<>());
-
     public GamePanel() {
-        initializeChess();
         try {
             boardImage = ImageIO.read(new File(GameRoomTool.VIEW_CHESS_BOARD));
         } catch (IOException e) {
@@ -55,31 +53,14 @@ public class GamePanel extends JPanel {
 
     public void action(GameRecord record){
         logger.info("棋子将要移动");
-        gameRecords.addLast(record);
 
         gameState.doAction(record);
         repaint();
     }
-    public void repealAction(){
-        if (gameRecords.isEmpty()) return;
+    public void repealAction(GameRecord record){
         logger.info("现在正在悔棋");
-
-        gameState.doRepeal(gameRecords.removeLast());
+        gameState.doRepeal(record);
         repaint();
-    }
-
-    private void initializeChess(){
-        String[] chessName = {"Rook", "Horse", "Bishop", "Guard", "General", "Guard", "Bishop", "Horse",
-                "Rook", "Cannon", "Cannon", "Solider", "Solider", "Solider", "Solider", "Solider"};
-        int[] chessXs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 3, 3, 3};
-        int[] chessYs = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 7, 0, 2, 4, 6, 8};
-
-        for (int i = 0; i < 16; ++ i){
-            gameState.board[chessXs[i]][chessYs[i]] = ChessFactory.create(chessName[i], false, new Point(chessXs[i], chessYs[i]));
-        }
-        for (int i = 0; i < 16; ++ i){
-            gameState.board[9 - chessXs[i]][chessYs[i]] = ChessFactory.create(chessName[i], true, new Point(9 - chessXs[i], chessYs[i]));
-        }
     }
 
     void paintChess(Graphics g){

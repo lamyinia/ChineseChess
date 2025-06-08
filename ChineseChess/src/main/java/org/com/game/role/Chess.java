@@ -22,14 +22,33 @@ public abstract class Chess implements Serializable {
     }
     public abstract boolean isAbleMove(Point target, GameState state);
 
-    public void setPoint(Point point) {
-        this.point = point;
+    public String getName() {
+        return name;
     }
-    public boolean getGroup() {
+    public void setName(String name) {
+        this.name = name;
+    }
+    public boolean isGroup() {
         return group;
     }
     public Point getPoint() {
         return point;
+    }
+    public void setPoint(Point point) {
+        this.point = point;
+    }
+    public int getImgX() {
+        return imgX;
+    }
+    public void setImgX(int imgX) {
+        this.imgX = imgX;
+    }
+    public int getImgY() {
+        return imgY;
+    }
+
+    public void setImgY(int imgY) {
+        this.imgY = imgY;
     }
 
     public void getImageXY(){

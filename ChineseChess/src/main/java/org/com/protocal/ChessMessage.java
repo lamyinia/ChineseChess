@@ -10,18 +10,22 @@ public class ChessMessage implements Serializable {
 
     public enum Type {
         LOGIN,
+        ONLINE,
         OFFLINE,
         REGISTER,
         FORGET,
         ACQUIRE_HALL_LIST,
         FIGHT,
         MOVE,
-        EAT,
-        DRAW,
+        DRAW_ACTION,
+        DRAW_REQUEST,
+        REPEAL_ACTION,
+        REPEAL_REQUEST,
+        WIN,
+        LOSE,
         SUCCESS,
         FAILURE,
         GIVE_UP,
-        REPEAL
     }
     public ChessMessage(){}
     public ChessMessage(Object message, Type type, String sender, String receiver){

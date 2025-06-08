@@ -166,3 +166,4 @@ MainServer新开线程GameThread
 #### 重大bug
 
 - 存客户端socket 的 ip 时参数写错了，写成了自己服务器socket的ip
+- String 的 == 符号用错了，一个是socket传来的String，一个是自己new的String，这是就算是 "ab" == "ab" 也会返回 false
