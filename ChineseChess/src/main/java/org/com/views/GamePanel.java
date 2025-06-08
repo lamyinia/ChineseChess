@@ -1,6 +1,8 @@
 package org.com.views;
 
+import org.com.game.role.Chess;
 import org.com.game.role.ChessFactory;
+import org.com.game.state.GameRecord;
 import org.com.game.state.GameState;
 import org.com.tools.GameRoomTool;
 import org.slf4j.Logger;
@@ -9,19 +11,17 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
+
 
 public class GamePanel extends JPanel {
     private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
 
     private BufferedImage boardImage;
-    private AtomicBoolean isLocked = new AtomicBoolean(false);
-    GameState gameState = new GameState();
+    public volatile GameState gameState = new GameState();
+    public volatile Chess selectedChess;
 
     public GamePanel() {
         initializeChess();
@@ -30,19 +30,30 @@ public class GamePanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public Chess getChessByXY(Point point){
+        return gameState.board[point.x][point.y];
+    }
+    public Chess getChessByXY(int x, int y){
+        return gameState.board[x][y];
+    }
+    public Chess getSelectedChess() {
+        return selectedChess;
+    }
+    public void setSelectedChess(Chess selectedChess) {
+        this.selectedChess = selectedChess;
+        repaint();
+    }
+    public GameState getGameState() {
+        return gameState;
+    }
 
-        addMouseEvent();
+    public void action(GameRecord record){
+        logger.info("棋子将要移动");
+        gameState.doAction(record);
+        repaint();
     }
-    private void addMouseEvent(){
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (isLocked.get()) return;
-                Point point = GameRoomTool.getPointFromImage(e.getPoint());
-                logger.info("点击的 x 坐标是 {}，y 坐标是 {}", (int)point.getX(), (int)point.getY());
-            }
-        });
-    }
+
     private void initializeChess(){
         String[] chessName = {"Rook", "Horse", "Bishop", "Guard", "General", "Guard", "Bishop", "Horse",
                 "Rook", "Cannon", "Cannon", "Solider", "Solider", "Solider", "Solider", "Solider"};
@@ -66,10 +77,12 @@ public class GamePanel extends JPanel {
             }
         }
     }
+
     @Override
     public void paint(Graphics g){
         super.paint(g);
         g.drawImage(boardImage, 0, 0, this);
         paintChess(g);
+        if (selectedChess != null) selectedChess.drawSelection(g);
     }
 }

@@ -4,6 +4,7 @@ import org.com.entity.User;
 import org.com.net.ChessClient;
 import org.com.net.Sender;
 import org.com.protocal.ChessMessage;
+import org.com.tools.GameRoomTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +24,6 @@ public class HallRoom extends JFrame {
     private User currentUser;
     private Vector<String> onlinePlayer;//登录的用户数据
 
-    private String mainServerIP = "127.0.0.1";
-    private int mainServerPort = 65140;
     ChessClient clientServer;
 
     HallRoom(User user, ChessClient chessServer){
@@ -54,11 +53,11 @@ public class HallRoom extends JFrame {
                     String receiver = onlinePlayer.elementAt(list.getSelectedIndex());
 
                     if (receiver.equals(currentUser.getAccount())) return;
-
-                    Sender sender = new Sender(mainServerIP, mainServerPort, 1000);
                     ChessMessage message = new ChessMessage(null, ChessMessage.Type.FIGHT, currentUser.getAccount(), receiver);
+
                     try {
-                        ChessMessage response = sender.send(message);
+                        ChessMessage response = new Sender(GameRoomTool.MAIN_SERVER_IP,
+                                GameRoomTool.MAIN_SERVER_PORT, 1000).send(message);
                         if (response.getType() == ChessMessage.Type.SUCCESS){
                             logger.info("{} 和 {} 对局的房间请求成功", currentUser.getAccount(), receiver);
                             notifyGameRoom(response);
@@ -75,9 +74,9 @@ public class HallRoom extends JFrame {
 
     private void HallListRequest(){
         new Thread(() -> {
-            Sender sender = new Sender(mainServerIP, mainServerPort, 1000);
             try {
-                sender.sendOnly(new ChessMessage(null, ChessMessage.Type.ACQUIRE_HALL_LIST, null, null));
+                new Sender(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT, 1000).sendOnly(new ChessMessage(null,
+                        ChessMessage.Type.ACQUIRE_HALL_LIST, null, null));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

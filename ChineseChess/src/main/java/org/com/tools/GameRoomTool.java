@@ -29,4 +29,7 @@ public class GameRoomTool {
         ret.y = (point.x - MARGIN + SIZE/2) / SPACE;
         return ret;
     }
+    public static boolean isALegalPoint(Point point){
+        return point.x >= 0 && point.x <= 9 && point.y >= 0 && point.y <= 8;
+    }
 }

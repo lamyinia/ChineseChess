@@ -1,5 +1,7 @@
 package org.com.game.role;
 
+import org.com.game.state.GameState;
+
 import java.awt.*;
 
 public class Solider extends Chess {
@@ -7,7 +9,7 @@ public class Solider extends Chess {
         super(name, group, point);
     }
     @Override
-    public boolean isAbleMove() {
+    public boolean isAbleMove(Point target, GameState state) {
         return false;
     }
 }

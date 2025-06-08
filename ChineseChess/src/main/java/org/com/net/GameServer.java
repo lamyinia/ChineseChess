@@ -1,17 +1,22 @@
 package org.com.net;
 
 import org.com.entity.User;
+import org.com.game.state.GameRecord;
 import org.com.protocal.ChessMessage;
 import org.com.tools.GameRoomTool;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GameServer extends Server implements Runnable {
 
     private int gamePort;
     MainServer.Client RedPlayer, BlackPlayer;
+    List <GameRecord> gameRecords = Collections.synchronizedList(new ArrayList<>());
 
     GameServer(MainServer.Client player1, MainServer.Client player2, boolean separation){
         serverName = "{%s}和{%s}的游戏房间服务器".formatted(player1.getUser().getAccount(), player2.getUser().getAccount());
