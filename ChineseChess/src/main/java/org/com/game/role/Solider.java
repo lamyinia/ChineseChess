@@ -10,6 +10,9 @@ public class Solider extends Chess {
     }
     @Override
     public boolean isAbleMove(Point target, GameState state) {
-        return false;
+        if (!isOneStep(target)) return false;
+        if (isGoForward(target)) return true;
+
+        return isOverRiver(point) && isGoSide(target);
     }
 }

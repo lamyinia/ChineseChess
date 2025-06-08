@@ -8,7 +8,12 @@ import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-/* 请求，单线程先发再收*/
+
+/**
+ * 职责是发送请求，根据需要阻塞线程，等待响应
+ * @author lanye
+ * @date 2025/06/08
+ */
 public class Sender {
     Socket socket;
     public Sender(){
@@ -25,7 +30,10 @@ public class Sender {
             e.printStackTrace();
         }
     }
-    // 发送必须有响应
+
+    /**
+     * 发送后必须有响应
+     */
     public ChessMessage send(ChessMessage message) throws IOException {
         try {
             SocketTool.sendMessage(socket, message);
@@ -37,7 +45,10 @@ public class Sender {
             SocketTool.closeSocket(socket); // 确保最终关闭Socket
         }
     }
-    // 发送必须没有响应
+
+    /**
+     * 发送后必须没有响应
+     */
     public void sendOnly(ChessMessage message) throws IOException {
         try (ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream())) {
             output.writeObject(message);

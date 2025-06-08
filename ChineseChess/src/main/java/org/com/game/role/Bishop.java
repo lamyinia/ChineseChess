@@ -18,7 +18,6 @@ public class Bishop extends Chess {
         if (isOverRiver(target)) return false;
         if (Math.abs(point.x-target.x) != 2 || Math.abs(point.y-target.y) != 2) return false;
         if (isStuck(target, state)) return false;
-
         return true;
     }
 }

@@ -69,14 +69,14 @@ public class LoginUI extends JFrame implements ActionListener {
     private void viewRegisterButton() {
         JButton registerButton = new JButton("注册");
         registerButton.setBounds(140, 200, 100, 30);
-        registerButton.setActionCommand("register");
+        registerButton.setActionCommand("REGISTER");
         registerButton.addActionListener(this);
         add(registerButton);
     }
     private void viewConfirmButton() {
         JButton confirmButton = new JButton("确定");
         confirmButton.setBounds(140, 140, 100, 30);
-        confirmButton.setActionCommand("loginConfirm");
+        confirmButton.setActionCommand("LOGIN_CONFIRM");
         confirmButton.addActionListener(this);
         add(confirmButton);
     }
@@ -87,14 +87,14 @@ public class LoginUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         switch (command) {
-            case "loginConfirm":
+            case "LOGIN_CONFIRM":
                 try {
                     loginConfirm(e);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
                 break;
-            case "register":
+            case "REGISTER":
                 register();
                 break;
             default:

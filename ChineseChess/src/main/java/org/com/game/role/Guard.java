@@ -11,6 +11,6 @@ public class Guard extends Chess {
     }
     @Override
     public boolean isAbleMove(Point target, GameState state) {
-        return false;
+        return Math.abs(target.x-point.x) == 1 && Math.abs(target.y-point.y) == 1 && isAtHome(target);
     }
 }

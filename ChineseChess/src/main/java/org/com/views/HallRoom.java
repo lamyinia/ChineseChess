@@ -12,6 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -24,7 +26,7 @@ public class HallRoom extends JFrame {
     private User currentUser;
     private Vector<String> onlinePlayer;//登录的用户数据
 
-    ChessClient clientServer;
+    ChessClient clientServer;  // 离线后能否关闭 ChessClient
 
     HallRoom(User user, ChessClient chessServer){
         this.currentUser = user;
@@ -42,7 +44,18 @@ public class HallRoom extends JFrame {
         setTitle("游戏大厅");
         setSize(400, 300);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                logger.info("正在关闭窗口");
+                int result = JOptionPane.showConfirmDialog(null, "是否关闭窗口");
+                if (result == JOptionPane.YES_OPTION){
+                    offLineHandle();
+                    System.exit(0);
+                }
+            }
+        });
     }
     private void decorateList() {
         list.addMouseListener(new MouseAdapter() {
@@ -76,7 +89,7 @@ public class HallRoom extends JFrame {
         new Thread(() -> {
             try {
                 new Sender(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT, 1000).sendOnly(new ChessMessage(null,
-                        ChessMessage.Type.ACQUIRE_HALL_LIST, null, null));
+                        ChessMessage.Type.ACQUIRE_HALL_LIST, currentUser.getAccount(), null));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -92,5 +105,13 @@ public class HallRoom extends JFrame {
         model.clear();
         data.forEach(item -> model.addElement(item));
         list.validate();
+    }
+    private void offLineHandle(){
+        try {
+            new Sender(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT, 1000).sendOnly(new ChessMessage(null,
+                    ChessMessage.Type.OFFLINE, currentUser.getAccount(), null));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

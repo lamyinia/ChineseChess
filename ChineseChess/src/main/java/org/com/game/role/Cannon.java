@@ -10,6 +10,8 @@ public class Cannon extends Chess {
     }
     @Override
     public boolean isAbleMove(Point target, GameState state) {
-        return false;
+        if (!isLine(target)) return false;
+         return state.board[target.x][target.y] != null ?
+                 lineCount(target, state) == 1 : lineCount(target, state) == 0;
     }
 }

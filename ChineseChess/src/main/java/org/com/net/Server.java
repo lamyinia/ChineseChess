@@ -9,7 +9,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/* 监听，多线程，先收再发 */
+/**
+ * 监听发来的 Socket，处理事务
+ * @author lanye
+ * @date 2025/06/08
+ */
 public abstract class Server {
     class HandleThread implements Runnable {
         Socket affair;

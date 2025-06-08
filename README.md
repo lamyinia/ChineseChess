@@ -78,7 +78,7 @@ UI渲染和游戏逻辑分离
 
 
 
-![](D:\git-project\ChineseChess\ChineseChess\files\img\chessboard-analysis.jpg)
+![](chessboard-analysis.jpg)
 
 
 

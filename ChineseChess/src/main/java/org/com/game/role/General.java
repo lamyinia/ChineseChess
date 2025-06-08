@@ -11,6 +11,6 @@ public class General extends Chess {
     @Override
     public boolean isAbleMove(Point target, GameState state) {
         if (!isAtHome(target)) return false;
-        return Math.abs(point.x-target.x)+Math.abs(point.y-target.y) == 1;
+        return isOneStep(target);
     }
 }

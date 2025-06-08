@@ -79,7 +79,6 @@ public class MainServer extends Server {
     private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
     private static final int MAX_POOL_SIZE = 50;;
 
-
     private ConcurrentHashMap<String, User> userTable = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Client> onlineTable = new ConcurrentHashMap<>();
     private ConcurrentHashMap <String, GameServer> activeGames = new ConcurrentHashMap<>();
@@ -131,7 +130,7 @@ public class MainServer extends Server {
                 loginHandle(affair, message);
                 break;
             case OFFLINE:
-                offlineHandle();
+                offlineHandle(message);
                 break;
             case ACQUIRE_HALL_LIST:
                 HallListHandle();
@@ -172,8 +171,12 @@ public class MainServer extends Server {
         }
 
     }
-    private void offlineHandle(){
+    private void offlineHandle(ChessMessage message){
+        logger.info("下线请求处理");
+        String sender = message.getSender();
+        onlineTable.remove(sender);
 
+        HallListHandle();
     }
 
     private void openGameRoomHandle(Socket affair, ChessMessage message){
@@ -200,15 +203,14 @@ public class MainServer extends Server {
         }
     }
     private void HallListHandle(){
-        logger.info("全局更新客户端的在线用户");
+        logger.info("全局更新客户端的大厅在线用户");
         Vector<String> items = new Vector<>();
         onlineTable.forEach((u, _) -> items.add(u));
         ChessMessage response = new ChessMessage(items, ChessMessage.Type.ACQUIRE_HALL_LIST, null, null);
         onlineTable.forEach((account, client) -> {
-            Sender sender = new Sender(client.getIp(), client.getPort(), 1000);
             try {
                 logger.info("更新用户 " + account + " 的大厅列表");
-                sender.sendOnly(response);
+                new Sender(client.getIp(), client.getPort(), 1000).sendOnly(response);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

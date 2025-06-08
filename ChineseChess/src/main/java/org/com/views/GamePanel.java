@@ -14,6 +14,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class GamePanel extends JPanel {
@@ -22,6 +25,8 @@ public class GamePanel extends JPanel {
     private BufferedImage boardImage;
     public volatile GameState gameState = new GameState();
     public volatile Chess selectedChess;
+
+    List<GameRecord> gameRecords = Collections.synchronizedList(new ArrayList<>());
 
     public GamePanel() {
         initializeChess();
@@ -50,7 +55,16 @@ public class GamePanel extends JPanel {
 
     public void action(GameRecord record){
         logger.info("棋子将要移动");
+        gameRecords.addLast(record);
+
         gameState.doAction(record);
+        repaint();
+    }
+    public void repealAction(){
+        if (gameRecords.isEmpty()) return;
+        logger.info("现在正在悔棋");
+
+        gameState.doRepeal(gameRecords.removeLast());
         repaint();
     }
 
@@ -79,8 +93,8 @@ public class GamePanel extends JPanel {
     }
 
     @Override
-    public void paint(Graphics g){
-        super.paint(g);
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g); // 替换paint方法
         g.drawImage(boardImage, 0, 0, this);
         paintChess(g);
         if (selectedChess != null) selectedChess.drawSelection(g);

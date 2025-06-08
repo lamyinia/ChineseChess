@@ -38,7 +38,10 @@ public abstract class Chess implements Serializable {
     }
     public void drawSelection(Graphics g){
         getImageXY();
-        g.drawRect(imgX, imgY, SIZE, SIZE);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setStroke(new BasicStroke(3));
+        g2d.setColor(Color.cyan);
+        g2d.drawOval(imgX, imgY, SIZE, SIZE);
     }
     public void drawChess(Graphics g, JPanel panel){
         getImageXY();
@@ -53,5 +56,31 @@ public abstract class Chess implements Serializable {
     public boolean isAtHome(Point target){
         if (target.y < 3 || target.y > 5) return false;
         return group==false ? target.x >= 0 && target.x <= 2 : target.x >= 7 && target.x <= 9;
+    }
+    public boolean isOneStep(Point target){
+        return Math.abs(point.x-target.x)+Math.abs(point.y-target.y) == 1;
+    }
+    public boolean isGoForward(Point target){
+        if (point.y != target.y || point.x == target.x) return false;
+        return group==false ? target.x > point.x : target.x < point.x;
+    }
+    public boolean isGoSide(Point target){
+        return point.x == target.x && point.y != target.y;
+    }
+    public boolean isLine(Point target){
+        return point.x == target.x || point.y == target.y;
+    }
+    public int lineCount(Point target, GameState state){
+        int count = 0;
+        if (point.x == target.x){
+            for (int i = Math.min(point.y, target.y)+1; i < Math.max(point.y, target.y); ++ i){
+                count += state.board[point.x][i] != null ? 1 : 0;
+            }
+        } else {
+            for (int i = Math.min(point.x, target.x)+1; i < Math.max(point.x, target.x); ++ i){
+                count += state.board[i][point.y] != null ? 1 : 0;
+            }
+        }
+        return count;
     }
 }

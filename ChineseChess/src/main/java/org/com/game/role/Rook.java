@@ -10,6 +10,6 @@ public class Rook extends Chess {
     }
     @Override
     public boolean isAbleMove(Point target, GameState state) {
-        return false;
+        return isLine(target) && lineCount(target, state) == 0;
     }
 }
