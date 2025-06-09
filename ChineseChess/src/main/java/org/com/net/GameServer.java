@@ -69,7 +69,6 @@ public class GameServer extends Server implements Runnable {
         MainServer.Client otherPlayer = findOtherPlayer(message.getSender());
 
         GameRecord record = (GameRecord) message.getMessage();
-//        logger.info("游戏服务器处理 Move 请求，发起者是{},接收者是{}，既{}", message.getSender(), message.getReceiver(), otherPlayer.getUser().getAccount());
         gameRecords.addLast(record);
         gameState.doAction(record);
 
@@ -87,6 +86,7 @@ public class GameServer extends Server implements Runnable {
     private void handleGiveUpEvent(ChessMessage message){
         MainServer.Client winPlayer = findOtherPlayer(message.getSender());
         MainServer.Client losePlayer = findOtherPlayer(message.getReceiver());
+        logger.info("{}赢了,{}输了", winPlayer.getUser().getAccount(), losePlayer.getUser().getAccount());
         notifyGameOver(winPlayer, ChessMessage.Type.WIN);
         notifyGameOver(losePlayer, ChessMessage.Type.LOSE);
     }

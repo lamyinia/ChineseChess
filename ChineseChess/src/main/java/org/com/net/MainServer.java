@@ -222,7 +222,7 @@ public class MainServer extends Server {
         ChessMessage response = new ChessMessage(items, ChessMessage.Type.ACQUIRE_HALL_LIST, null, null);
         onlineTable.forEach((account, client) -> {
             try {
-                logger.info("更新用户 " + account + " 的大厅列表");
+//                logger.info("更新用户 " + account + " 的大厅列表");
                 new Sender(client.getIp(), client.getPort(), 1000).sendOnly(response);
             } catch (IOException e) {
                 throw new RuntimeException(e);
