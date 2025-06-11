@@ -6,4 +6,5 @@ public interface ConnectionCallBack {
     void acquireLobbyConnection(User user, int lobbyPort);
     void acquireGameRoomConnection(boolean group, String opponent, int gameRoomPort);
     void exitGameRoom();
+    void exitLobby();
 }

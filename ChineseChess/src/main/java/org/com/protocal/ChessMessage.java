@@ -12,8 +12,9 @@ public class ChessMessage implements Serializable {
     public enum Type {
         HEARTBEAT,
         LOGIN,
-        ONLINE,
-        OFFLINE,
+        PRESENT,
+        ABSENT,
+        LOGOUT,
         REGISTER,
         FORGET,
         ACQUIRE_LOBBY,
@@ -33,6 +34,8 @@ public class ChessMessage implements Serializable {
         SUCCESS,
         FAILURE,
         GIVE_UP,
+        DISCONNECT_FIRST,
+        DISCONNECT_SECOND
     }
     public ChessMessage(){}
     public ChessMessage(Object message, Type type, String sender, String receiver){

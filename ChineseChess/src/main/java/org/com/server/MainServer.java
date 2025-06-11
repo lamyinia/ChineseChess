@@ -106,23 +106,12 @@ public class MainServer extends Server {
             case LOGIN:
                 loginHandle(affair, message);
                 break;
-            case ACQUIRE_LOBBY:
+            case LOGOUT:
+                logoutHandle(message);
                 break;
             case ACQUIRE_GAME_ROOM:
                 openGameRoomHandle(affair, message);
                 break;
-//            case ONLINE:
-//                onlineHandle(affair, message);
-//                break;
-//            case OFFLINE:
-//                offlineHandle(message);
-//                break;
-//            case ACQUIRE_LOBBY_LIST:
-//                HallListHandle();
-//                break;
-//            case FIGHT:
-//                openGameRoomHandle(affair, message);
-//                break;
             default:
                 break;
         }
@@ -155,15 +144,10 @@ public class MainServer extends Server {
             SocketTool.closeSocket(affair);
         }
     }
-
-
-//    private void offlineHandle(ChessMessage message){
-//        logger.info("下线请求处理");
-//        String sender = message.getSender();
-//        onlineTable.remove(sender);
-//
-//        HallListHandle();
-//    }
+    private void logoutHandle(ChessMessage message){
+        String sender = message.getSender();
+        onlineTable.remove(sender);
+    }
 
     private void openGameRoomHandle(Socket affair, ChessMessage message){
         logger.info("处理客户端房间请求");

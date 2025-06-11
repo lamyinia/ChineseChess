@@ -1,6 +1,7 @@
 package org.com.net;
 
 import org.com.protocal.ChessMessage;
+import org.com.tools.GameRoomTool;
 import org.com.tools.SocketTool;
 import org.slf4j.Logger;
 
@@ -19,6 +20,7 @@ public abstract class PersistentConnection {
     protected Socket socket;
     private volatile Instant lastActiveTime;
     private AtomicBoolean isActive;
+    private AtomicBoolean isListen;
     private Lock writeLock = new ReentrantLock();
 
     protected Logger connectionlogger;
@@ -30,16 +32,33 @@ public abstract class PersistentConnection {
         this.socket = socket;
         this.lastActiveTime = Instant.now();
         this.isActive = new AtomicBoolean(true);
+        this.isListen = new AtomicBoolean(true);
     }
 
+    /**
+     * 可以再优化一下断连的方法
+     */
     protected void listen(){
         while (isActive()){
             ChessMessage message = receive();
+            if (message.getType() == ChessMessage.Type.DISCONNECT_FIRST
+                    || message.getType() == ChessMessage.Type.DISCONNECT_SECOND){
+                if (message.getType() == ChessMessage.Type.DISCONNECT_FIRST){
+                    send(new ChessMessage(null, ChessMessage.Type.DISCONNECT_SECOND, null, null));
+                    isActive.set(false);
+                    SocketTool.closeSocket(socket);
+                }
+                break;
+            }
             new Thread(new HandleThread(message)).start();
         }
+
+        isListen.set(false);
     }
 
     public void send(ChessMessage message){
+        if (!isActive.get()) return;
+
         writeLock.lock();
         try {
             SocketTool.sendMessage(socket, message);
@@ -50,6 +69,7 @@ public abstract class PersistentConnection {
         }
     }
     protected ChessMessage receive(){
+
         try {
             return SocketTool.receiveMessage(socket);
         } catch (IOException e) {
@@ -62,8 +82,16 @@ public abstract class PersistentConnection {
         return isActive.get() && socket != null && !socket.isClosed() && socket.isConnected();
     }
     public void close(){
+        if (socket.isConnected()){
+            send(new ChessMessage(null, ChessMessage.Type.DISCONNECT_FIRST, null, null));
+        }
         isActive.set(false);
+
+        // 如果上面的数据丢失，就陷入死循环了
+        while (isListen.get());
+
         SocketTool.closeSocket(socket);
+        connectionlogger.info("连接断开");
     }
 
 

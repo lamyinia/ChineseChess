@@ -35,14 +35,24 @@ public class LobbyController implements LobbyCallBack {
         new Thread(lobbyConnection).start();
     }
 
+    public void reEnterLobby(){
+        lobbyUI.setVisible(true);
+        lobbyConnection.send(new ChessMessage(null, ChessMessage.Type.PRESENT, currentAccount, null));
+    }
+    public void exitLobby(){
+        lobbyUI.setVisible(false);
+        lobbyConnection.send(new ChessMessage(null, ChessMessage.Type.ABSENT, currentAccount, null));
+    }
+
+
     @Override
     public void refreshLobbyList(){
         lobbyConnection.handleRequestLobbyList();
     }
-//    @Override
-//    public void fightRequestEvent(){
-//
-//    }
+    @Override
+    public void fightRequestEvent(){
+
+    }
     @Override
     public void fightEvent(String sender, String receiver){
         // 询问 receiver 是否同意，如果同意，继续下面逻辑，谁发起的挑战，谁发送请求房间的 Socket
@@ -58,7 +68,10 @@ public class LobbyController implements LobbyCallBack {
     }
     @Override
     public void logoutEvent(){
-
+        lobbyConnection.send(new ChessMessage(null, ChessMessage.Type.LOGOUT, currentAccount, null));
+        lobbyConnection.close();
+        lobbyUI.dispose();
+        callBack.exitLobby();
     }
 
     public class LobbyConnection extends PersistentConnectionToServer implements Runnable {

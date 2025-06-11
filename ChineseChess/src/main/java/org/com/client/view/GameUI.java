@@ -3,8 +3,6 @@ package org.com.client.view;
 import org.com.client.callback.GameCallBack;
 import org.com.game.role.Chess;
 import org.com.game.state.GameRecord;
-import org.com.net.Sender;
-import org.com.protocal.ChessMessage;
 import org.com.tools.GameRoomTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +14,6 @@ import java.awt.event.*;
 public class GameUI extends JFrame implements ActionListener {
     private static final Logger logger = LoggerFactory.getLogger(GameUI.class);
     GameCallBack callBack;
-
-    private String gameServerIp;
-    private int gameServerPort;
 
     public GamePanel gamePanel;
     boolean group;
@@ -48,8 +43,7 @@ public class GameUI extends JFrame implements ActionListener {
                 logger.info("正在关闭窗口");
                 int result = JOptionPane.showConfirmDialog(null, "是否关闭窗口");
                 if (result == JOptionPane.YES_OPTION){
-                    callBack.exitGame();
-                    System.exit(0);
+                    callBack.exitGameEvent();
                 }
             }
         });
@@ -65,7 +59,6 @@ public class GameUI extends JFrame implements ActionListener {
      * 启用双缓冲减少闪烁，添加立体边框，添加鼠标悬停效果
      */
     private void decorateGamePanel() {
-
         gamePanel = new GamePanel() {
             @Override
             public void paint(Graphics g) {
@@ -110,6 +103,7 @@ public class GameUI extends JFrame implements ActionListener {
 
         add(gamePanel, BorderLayout.CENTER);
     }
+
     private void handleChessSelection(Chess origin, Chess next, Point target) {
         if (origin == null) handleFirstSelection(next);
         else handleSecondSelection(origin, next, target);
@@ -134,18 +128,10 @@ public class GameUI extends JFrame implements ActionListener {
             moveChess(origin, null, target, false);
         }
     }
-    private void moveChess(Chess chess, Chess targetChess, Point target, boolean isEat) {
-        Point origin = chess.getPoint();
-        chess.setPoint(target);
-        GameRecord record = new GameRecord(origin, target, chess, targetChess, isEat);
-
-        gamePanel.action(record);
-        gamePanel.setSelectedChess(null);
-        updateHintLabel();
-
-        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(record, ChessMessage.Type.MOVE,
-                    currentPlayer, opponentPlayer));
-
+    private void moveChess(Chess chess, Chess targetChess, Point targetPoint, boolean isEat) {
+        Point orginPoint = chess.getPoint();
+        chess.setPoint(targetPoint);
+        callBack.moveChessEvent(new GameRecord(orginPoint, targetPoint, chess, targetChess, isEat));
     }
     public void updateHintLabel(){
         hintLabel.setText(!gamePanel.getGameState().gameTurn.get() ? "红方回合" : "黑方回合");
@@ -193,40 +179,44 @@ public class GameUI extends JFrame implements ActionListener {
         logger.info("功能按钮被点击");
         switch (command){
             case "REPEAL":
-                handleRepealEvent();
+                handleRepealCommand();
                 break;
             case "DRAW":
-                handleDrawEvent();
+                handleDrawCommand();
                 break;
             case "GIVE_UP":
-                handleGiveUpEvent();
+                handleGiveUpCommand();
                 break;
         }
     }
     private boolean isMyTurn(){
         return gamePanel.getGameState().gameTurn.get() == group;
     }
-    private void handleRepealEvent(){
-        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                ChessMessage.Type.REPEAL_REQUEST, currentPlayer, opponentPlayer));
+
+    private void handleRepealCommand(){
+        callBack.repealRequestEvent();
     }
-    private void handleDrawEvent(){
-        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                ChessMessage.Type.DRAW_REQUEST, currentPlayer, opponentPlayer));
+    private void handleDrawCommand(){
+        callBack.drawRequestEvent();
     }
-    private void handleGiveUpEvent(){
-        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                    ChessMessage.Type.GIVE_UP, currentPlayer, opponentPlayer));
+    private void handleGiveUpCommand(){
+        callBack.exitGameEvent();
     }
 
     public void confirmRepealRequest(){
-        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                ChessMessage.Type.REPEAL_ACTION, currentPlayer, opponentPlayer));
+        int result = JOptionPane.showConfirmDialog(null, "对方悔棋，是否确定");
+        if (result == JOptionPane.YES_OPTION){
+            callBack.repealActionEvent();
+        }
     }
     public void confirmDrawRequest(){
         int result = JOptionPane.showConfirmDialog(null, "对方求和，是否确定");
-        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                ChessMessage.Type.DRAW_ACTION, currentPlayer, opponentPlayer));
+        if (result == JOptionPane.YES_OPTION){
+            callBack.drawActionEvent();
+        }
+    }
+    public void showResult(String condition){
+        JOptionPane.showMessageDialog(null, "你%s了".formatted(condition));
     }
 }
 

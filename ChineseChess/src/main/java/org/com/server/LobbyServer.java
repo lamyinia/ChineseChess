@@ -22,7 +22,6 @@ public class LobbyServer extends Server implements Runnable {
     Set <String> lobbySet;
     ConcurrentHashMap <String, LobbyConnection> lobbyMap;
 
-
     public LobbyServer(){
         logger = LoggerFactory.getLogger(LobbyServer.class);
         serverName = "大厅处理服务器";
@@ -40,8 +39,9 @@ public class LobbyServer extends Server implements Runnable {
         lobbyMap.put(sender, (LobbyConnection) runner);
         lobbySet.add(sender);
     }
-    private void removeConnection(ChessMessage message){
-
+    private void removeConnection(String account){
+        lobbyMap.remove(account);
+        lobbySet.remove(account);
     }
 
     @Override
@@ -79,8 +79,14 @@ public class LobbyServer extends Server implements Runnable {
                 case FIGHT:
                     handleNotifyFight(message);
                     break;
-                case OFFLINE:
-                    handleOffline(message);
+                case PRESENT:
+                    handlePresent(message);
+                    break;
+                case ABSENT:
+                    handleAbsent(message);
+                    break;
+                case LOGOUT:
+                    handleLogout(message);
                     break;
                 case ACQUIRE_LOBBY_LIST:
                     handleAcquireLobbyList(message);
@@ -103,16 +109,18 @@ public class LobbyServer extends Server implements Runnable {
 //            for (String s : lobbySet) {
 //                System.out.print(s + " ");
 //            }
-//            System.out.println();
-
             lobbyMap.get(sender).send(new ChessMessage(lobbySet, ChessMessage.Type.ACQUIRE_LOBBY_LIST_SUCCESS, null, null));
         }
-        public void handleOffline(ChessMessage message) {
+        private void handleLogout(ChessMessage message){
             String sender = message.getSender();
-
-            lobbyMap.get(sender).close();  // 移除前关闭 connection
-
-            lobbyMap.remove(sender);
+            removeConnection(sender);
+        }
+        private void handlePresent(ChessMessage message){
+            String sender = message.getSender();
+            lobbySet.add(sender);
+        }
+        private void handleAbsent(ChessMessage message) {
+            String sender = message.getSender();
             lobbySet.remove(sender);
         }
         private void handleNotifyFight(ChessMessage message){

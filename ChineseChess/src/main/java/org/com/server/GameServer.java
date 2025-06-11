@@ -1,11 +1,11 @@
 package org.com.server;
 
+import org.com.game.role.General;
 import org.com.game.state.GameRecord;
 import org.com.game.state.GameState;
 import org.com.net.PersistentConnectionToClient;
 import org.com.protocal.ChessMessage;
 import org.com.tools.GameRoomTool;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.Socket;
@@ -18,7 +18,6 @@ public class GameServer extends Server implements Runnable {
 
     String redAccount, blackAccount;
     private int gamePort;
-
 
     List <GameRecord> gameRecords = Collections.synchronizedList(new ArrayList<>());
     private GameState gameState = new GameState();
@@ -55,83 +54,21 @@ public class GameServer extends Server implements Runnable {
             logger.info("黑方的 {} 进入游戏", blackAccount);
         }
     }
-//    private void handleMoveAction(ChessMessage message){
-//        MainServer.Client otherPlayer = findOtherPlayer(message.getSender());
-//
-//        GameRecord record = (GameRecord) message.getMessage();
-//        gameRecords.addLast(record);
-//        gameState.doAction(record);
-//
-//        try {
-//            new Sender(otherPlayer.getIp(), otherPlayer.getPort(), 1000).sendOnly(message);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        if (record.getEatenChess() instanceof General){
-//            notifyGameOver(findOtherPlayer(message.getReceiver()), ChessMessage.Type.WIN);
-//            notifyGameOver(findOtherPlayer(message.getSender()), ChessMessage.Type.LOSE);
-//        }
-//    }
-//    private void handleGiveUpEvent(ChessMessage message){
-//        MainServer.Client winPlayer = findOtherPlayer(message.getSender());
-//        MainServer.Client losePlayer = findOtherPlayer(message.getReceiver());
-//        logger.info("{}赢了,{}输了", winPlayer.getUser().getAccount(), losePlayer.getUser().getAccount());
-//        notifyGameOver(winPlayer, ChessMessage.Type.WIN);
-//        notifyGameOver(losePlayer, ChessMessage.Type.LOSE);
-//    }
-//    private void handleDrawRequestEvent(ChessMessage message){
-//        MainServer.Client otherPlayer = findOtherPlayer(message.getSender());
-//        try {
-//            new Sender(otherPlayer.getIp(), otherPlayer.getPort(), 1000).sendOnly(new ChessMessage(null,
-//                    ChessMessage.Type.DRAW_REQUEST, null, null));
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//    private void handleDrawActionEvent(){
-//        notifyGameOver(redPlayer, ChessMessage.Type.DRAW_ACTION);
-//        notifyGameOver(blackPlayer, ChessMessage.Type.DRAW_ACTION);
-//    }
-//    private void handleRepealRequestEvent(ChessMessage message){
-//        MainServer.Client otherPlayer = findOtherPlayer(message.getSender());
-//        try {
-//            new Sender(otherPlayer.getIp(), otherPlayer.getPort(), 1000).sendOnly(new ChessMessage(null,
-//                    ChessMessage.Type.REPEAL_REQUEST, null, null));
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//    private void handleRepealActionEvent(){
-//        if (gameRecords.isEmpty()) return;
-//
-//        GameRecord record = gameRecords.removeLast();
-//        try {
-//            new Sender(redPlayer.getIp(), redPlayer.getPort(), 1000).sendOnly(new ChessMessage(record,
-//                    ChessMessage.Type.REPEAL_ACTION, null, null));
-//            new Sender(blackPlayer.getIp(), blackPlayer.getPort(), 1000).sendOnly(new ChessMessage(record,
-//                    ChessMessage.Type.REPEAL_ACTION, null, null));
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//    private void notifyGameOver(MainServer.Client player, ChessMessage.Type condition){
-//        logger.info("通知{}游戏结束", player.getUser().getAccount());
-//        try {
-//            new Sender(player.getIp(), player.getPort(), 1000).sendOnly(new ChessMessage(null,
-//                    condition, null, null));
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
 
+    private void notifyGameOver(ChessMessage message, String account, ChessMessage.Type condition){
+        logger.info("通知{}游戏结束", account);
+        findConnection(account).send(new ChessMessage(message, condition, null, null));
+    }
+
+    private GameConnection findConnection(String account){
+        if (account.equals(redAccount)) return redConnection;
+        else return blackConnection;
+    }
 
     @Override
     public void run() {
         listen();
     }
-
     public class GameConnection extends PersistentConnectionToClient implements Runnable {
         public GameConnection(){}
         public GameConnection(Socket socket) {
@@ -150,19 +87,19 @@ public class GameServer extends Server implements Runnable {
                     handleMoveAction(message);
                     break;
                 case GIVE_UP:
-//                    handleGiveUpEvent(message);
+                    handleGiveUpAction(message);
                     break;
                 case DRAW_REQUEST:
-                    handleDrawRequestEvent(message);
+                    handleDrawRequest(message);
                     break;
                 case DRAW_ACTION:
-                    handleDrawActionEvent(message);
+                    handleDrawAction(message);
                     break;
                 case REPEAL_REQUEST:
-                    handleRepealRequestEvent(message);
+                    handleRepealRequest(message);
                     break;
                 case REPEAL_ACTION:
-                    handleRepealActionEvent(message);
+                    handleRepealAction();
                     break;
                 default:
                     break;
@@ -176,21 +113,45 @@ public class GameServer extends Server implements Runnable {
         private void handleHeartbeat(){
             // 心跳发送
         }
-
-        private void handleDrawRequestEvent(ChessMessage message) {
-
-        }
         private void handleMoveAction(ChessMessage message) {
+            GameRecord record = (GameRecord) message.getMessage();
+            gameState.doAction(record);
+            gameRecords.addLast(record);
+            findConnection(message.getReceiver()).send(message);
 
+            if (record.getEatenChess() instanceof General){
+                notifyGameOver(null, message.getSender(), ChessMessage.Type.WIN);
+                notifyGameOver(null, message.getReceiver(), ChessMessage.Type.LOSE);
+                GameServer.this.stopListen();
+            }
         }
-        private void handleDrawActionEvent(ChessMessage message) {
-
+        private void handleDrawRequest(ChessMessage message) {
+            String receiver = message.getReceiver();
+            findConnection(receiver).send(message);
         }
-        private void handleRepealRequestEvent(ChessMessage message) {
-
+        private void handleDrawAction(ChessMessage message) {
+            notifyGameOver(null, redAccount, ChessMessage.Type.DRAW_ACTION);
+            notifyGameOver(null, blackAccount, ChessMessage.Type.DRAW_ACTION);
+            GameServer.this.stopListen();
         }
-        private void handleRepealActionEvent(ChessMessage message) {
+        private void handleRepealRequest(ChessMessage message) {
+            String receiver = message.getReceiver();
+            findConnection(receiver).send(message);
+        }
+        private void handleRepealAction() {
+            if (gameRecords.isEmpty()) return;
+            GameRecord record = gameRecords.removeLast();
+            gameState.doRepeal(record);
 
+            redConnection.send(new ChessMessage(record, ChessMessage.Type.REPEAL_ACTION, null, null));
+            blackConnection.send(new ChessMessage(record, ChessMessage.Type.REPEAL_ACTION, null, null));
+        }
+        private void handleGiveUpAction(ChessMessage message) {
+            String losePlayer = message.getSender();
+            String winPlayer = message.getReceiver();
+            notifyGameOver(null, winPlayer, ChessMessage.Type.WIN);
+            notifyGameOver(null, losePlayer, ChessMessage.Type.LOSE);
+            GameServer.this.stopListen();
         }
     };
 }

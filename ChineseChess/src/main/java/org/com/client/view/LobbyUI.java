@@ -1,10 +1,7 @@
 package org.com.client.view;
 
 import org.com.client.callback.LobbyCallBack;
-import org.com.entity.User;
-import org.com.net.Sender;
 import org.com.protocal.ChessMessage;
-import org.com.tools.GameRoomTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +52,7 @@ public class LobbyUI extends JFrame {
                 logger.info("正在关闭窗口");
                 int result = JOptionPane.showConfirmDialog(null, "是否关闭窗口");
                 if (result == JOptionPane.YES_OPTION){
-                    offLineHandle();
+                    logoutHandle();
                     System.exit(0);
                 }
             }
@@ -127,7 +124,7 @@ public class LobbyUI extends JFrame {
     }
     public void notifyGameRoom(ChessMessage message, String currentPlayer, String opponentPlayer){
         setVisible(false);
-        offLineHandle();
+        logoutHandle();
 
         Object[] thing = (Object[]) message.getMessage();
     }
@@ -141,7 +138,7 @@ public class LobbyUI extends JFrame {
 
         list.validate();
     }
-    private void offLineHandle(){
+    private void logoutHandle(){
         callBack.logoutEvent();
     }
 
@@ -254,7 +251,7 @@ public class LobbyUI extends JFrame {
             int result = JOptionPane.showConfirmDialog(LobbyUI.this, "确定要退出游戏大厅吗？", "退出确认",
                     JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
-                offLineHandle();
+                logoutHandle();
                 System.exit(0);
             }
         });

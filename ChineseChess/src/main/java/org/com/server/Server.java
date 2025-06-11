@@ -51,6 +51,8 @@ public abstract class Server {
             }
             new Thread(new HandleThread(affair)).start();
         }
+
+        logger.info(serverName + ", 端口在 " + socket.getLocalPort() + " 停止监听");
     }
     private void handleMessage(Socket affair) throws IOException {
         ChessMessage message;
@@ -60,6 +62,9 @@ public abstract class Server {
             throw new RuntimeException(e);
         }
         handle(affair, message);
+    }
+    public void stopListen(){
+        running.set(false);
     }
     protected int findFreeServerSocket(int i){
         if (i >= 65536) return -1;

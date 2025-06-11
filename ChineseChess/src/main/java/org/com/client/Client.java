@@ -5,6 +5,7 @@ import org.com.client.controller.GameController;
 import org.com.client.controller.LobbyController;
 import org.com.client.controller.LoginController;
 import org.com.entity.User;
+import org.com.net.Sender;
 import org.com.protocal.ChessMessage;
 import org.com.tools.GameRoomTool;
 import org.com.tools.SocketTool;
@@ -73,11 +74,19 @@ public class Client implements ConnectionCallBack {
             throw new RuntimeException(e);
         }
 
-        lobbyController.lobbyUI.setVisible(false);
+        lobbyController.exitLobby();
         gameController = new GameController(this, socket, group, currentUser.getAccount(), opponent);
     }
     @Override
     public void exitGameRoom(){
+        gameController.close();
+        gameController = null;
+        lobbyController.reEnterLobby();
+    }
 
+    @Override
+    public void exitLobby() {
+        new Sender(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT, GameRoomTool.DEFAULT_SOCKET_TIMEOUT)
+                .sendOnly(new ChessMessage(null, ChessMessage.Type.LOGOUT, currentUser.getAccount(), null));
     }
 }

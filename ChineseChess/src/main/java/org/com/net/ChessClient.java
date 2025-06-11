@@ -60,15 +60,6 @@
 //            case DRAW_REQUEST:
 //                handleDrawRequest();
 //                break;
-//            case DRAW_ACTION:
-//                handleGameOver("和对手平局");
-//                break;
-//            case WIN:
-//                handleGameOver("赢");
-//                break;
-//            case LOSE:
-//                handleGameOver("输");
-//                break;
 //            default:
 //                break;
 //        }
@@ -77,9 +68,7 @@
 //        Vector<String> data = (Vector<String>) message.getMessage();
 //        hallRoom.addHallList(data);
 //    }
-//    private void acquireGameRoom(ChessMessage message){
-//        hallRoom.notifyGameRoom(message, message.getReceiver(), message.getSender());
-//    }
+
 //    private void handleRepealRequest(){
 //        gameRoom.confirmRepealRequest();
 //    }
