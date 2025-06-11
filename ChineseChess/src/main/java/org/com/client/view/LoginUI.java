@@ -1,11 +1,6 @@
-package org.com.views;
+package org.com.client.view;
 
-import org.com.entity.User;
-import org.com.net.ChessClient;
-import org.com.net.Sender;
-import org.com.protocal.ChessMessage;
-import org.com.tools.GameRoomTool;
-import org.com.tools.SocketTool;
+import org.com.client.callback.LoginCallBack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,40 +10,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class LoginUI extends JFrame implements ActionListener {
     private static final Logger logger = LoggerFactory.getLogger(LoginUI.class);
+
+    LoginCallBack callBack;
+
     private JTextField accountText;
     private JPasswordField passwordText;
     private JButton loginButton;
     private JButton registerButton;
     private JPanel contentPanel;
 
-    ChessClient clientServer;
-
-    HallRoom hallRoom;
-
-    public LoginUI() {
-        clientServer = new ChessClient();
-        new Thread(clientServer).start();
+    public LoginUI(LoginCallBack callBack) {
+        this.callBack = callBack;
 
         initUI();
         setVisible(true);
     }
-    private Component getComponentByName(Container container, Class<?> componentClass) {
-        for (Component comp : container.getComponents()) {
-            if (componentClass.isInstance(comp)) {
-                return comp;
-            } else if (comp instanceof Container) {
-                Component child = getComponentByName((Container) comp, componentClass);
-                if (child != null) {
-                    return child;
-                }
-            }
-        }
-        return null;
-    }
+
     private void initUI() {
         setTitle("中国象棋 - 登录");
         setSize(500, 400);
@@ -69,6 +49,74 @@ public class LoginUI extends JFrame implements ActionListener {
         setDropShadow();
     }
 
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        logger.info("{}命令", command);
+        switch (command) {
+            case "LOGIN_CONFIRM":
+                loginConfirm();
+                break;
+            case "REGISTER":
+                register();
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    private void loginConfirm(){
+        String account = accountText.getText();
+        String password = new String(passwordText.getPassword());
+
+        if ("".equals(account) || "".equals(password)){
+            showError("账号密码不能为空");
+            return;
+        }
+
+        new Thread(() -> callBack.loginEvent(account, password)).start();
+    }
+
+    private void register() {
+        JDialog registerDialog = new JDialog(this, "注册新账号", true);
+        registerDialog.setSize(400, 300);
+        registerDialog.setLocationRelativeTo(this);
+        registerDialog.setLayout(new BorderLayout());
+        registerDialog.getContentPane().setBackground(Color.WHITE);
+
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JPanel accountPanel = createInputPanel("账号：", "请输入账号", true);
+        JPanel passwordPanel = createInputPanel("密码：", "请输入密码", false);
+        JPanel confirmPanel = createInputPanel("确认：", "请再次输入密码", false);
+
+        JButton registerBtn = createGradientButton("注册", new Color(100, 149, 237));
+        registerBtn.addActionListener(e -> {
+            // 这里添加注册逻辑
+            JOptionPane.showMessageDialog(registerDialog, "注册功能尚未实现", "提示",
+                    JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        formPanel.add(accountPanel);
+        formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        formPanel.add(passwordPanel);
+        formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        formPanel.add(confirmPanel);
+        formPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        formPanel.add(registerBtn);
+
+        registerDialog.add(formPanel);
+        registerDialog.setVisible(true);
+    }
+
+
+    /**
+     * 渲染部分
+     */
     private void setDropShadow() {
         // 创建一个带阴影的面板
         JPanel shadowPanel = new JPanel(new BorderLayout());
@@ -316,7 +364,6 @@ public class LoginUI extends JFrame implements ActionListener {
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         footerPanel.setOpaque(false);
 
-        // 版权信息
         JLabel copyrightLabel = new JLabel("© 2025 中国象棋 版权所有 lanye");
         copyrightLabel.setFont(new Font("微软雅黑", Font.PLAIN, 12));
         copyrightLabel.setForeground(new Color(150, 150, 150));
@@ -325,106 +372,22 @@ public class LoginUI extends JFrame implements ActionListener {
 
         return footerPanel;
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String command = e.getActionCommand();
-        logger.info("{}命令", command);
-        switch (command) {
-            case "LOGIN_CONFIRM":
-                try {
-                    loginConfirm(e);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+    private Component getComponentByName(Container container, Class<?> componentClass) {
+        for (Component comp : container.getComponents()) {
+            if (componentClass.isInstance(comp)) {
+                return comp;
+            } else if (comp instanceof Container) {
+                Component child = getComponentByName((Container) comp, componentClass);
+                if (child != null) {
+                    return child;
                 }
-                break;
-            case "REGISTER":
-                register();
-                break;
-            default:
-                break;
-        }
-    }
-
-
-    private void loginConfirm(ActionEvent e) throws IOException {
-        String account = accountText.getText();
-        String password = new String(passwordText.getPassword());
-
-        if ("".equals(account) || "".equals(password)){
-            SocketTool.showErrorBox("账号密码不能为空");
-            return;
-        }
-
-        new Thread(() -> {
-            try {
-                ChessMessage response = new Sender(GameRoomTool.MAIN_SERVER_IP, GameRoomTool.MAIN_SERVER_PORT, 1000).send
-                        (new ChessMessage(new Object[] {new User(account, password), clientServer.getPort()}, ChessMessage.Type.LOGIN, null, null));
-                SwingUtilities.invokeLater(() -> {
-                    if (response.getType() == ChessMessage.Type.SUCCESS) {
-                        logger.info("登录成功");
-                        dispose();
-                        hallRoom = new HallRoom(new User(account, password), clientServer);
-                        clientServer.setHallRoom(hallRoom);
-                    } else {
-                        logger.info("登录失败");
-                        SocketTool.showErrorBox((String)response.getMessage());
-
-                        JOptionPane.getRootFrame().setAlwaysOnTop(true);
-                        Toolkit.getDefaultToolkit().beep();
-                    }
-                });
-            } catch (IOException ex) {
-                SwingUtilities.invokeLater(() -> {
-                    SocketTool.showErrorBox("连接服务器失败: " + ex.getMessage());
-                });
             }
-        }).start();
+        }
+        return null;
     }
-
-    private void register() {
-        JDialog registerDialog = new JDialog(this, "注册新账号", true);
-        registerDialog.setSize(400, 300);
-        registerDialog.setLocationRelativeTo(this);
-        registerDialog.setLayout(new BorderLayout());
-        registerDialog.getContentPane().setBackground(Color.WHITE);
-
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JPanel accountPanel = createInputPanel("账号：", "请输入账号", true);
-        JPanel passwordPanel = createInputPanel("密码：", "请输入密码", false);
-        JPanel confirmPanel = createInputPanel("确认：", "请再次输入密码", false);
-
-        JButton registerBtn = createGradientButton("注册", new Color(100, 149, 237));
-        registerBtn.addActionListener(e -> {
-            // 这里添加注册逻辑
-            JOptionPane.showMessageDialog(registerDialog, "注册功能尚未实现", "提示",
-                    JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        formPanel.add(accountPanel);
-        formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        formPanel.add(passwordPanel);
-        formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        formPanel.add(confirmPanel);
-        formPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        formPanel.add(registerBtn);
-
-        registerDialog.add(formPanel);
-        registerDialog.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            new LoginUI();
-        });
+    public void showError(String message){
+        JOptionPane.showMessageDialog(null, message, "错误", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.getRootFrame().setAlwaysOnTop(true);
+        Toolkit.getDefaultToolkit().beep();
     }
 }

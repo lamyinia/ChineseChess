@@ -10,7 +10,7 @@ import java.net.Socket;
 
 
 /**
- * 职责是发送请求，根据需要阻塞线程，等待响应
+ * 建立短连接，根据需要阻塞线程，等待响应
  * @author lanye
  * @date 2025/06/08
  */
@@ -34,12 +34,12 @@ public class Sender {
     /**
      * 发送后必须有响应
      */
-    public ChessMessage send(ChessMessage message) throws IOException {
+    public ChessMessage send(ChessMessage message){
         try {
             SocketTool.sendMessage(socket, message);
             ChessMessage response = SocketTool.receiveMessage(socket);
             return response;
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         } finally {
             SocketTool.closeSocket(socket); // 确保最终关闭Socket
@@ -49,10 +49,12 @@ public class Sender {
     /**
      * 发送后必须没有响应
      */
-    public void sendOnly(ChessMessage message) throws IOException {
+    public void sendOnly(ChessMessage message) {
         try (ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream())) {
             output.writeObject(message);
             output.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
             SocketTool.closeSocket(socket);
         }

@@ -2,6 +2,7 @@ package org.com.protocal;
 
 import java.io.Serializable;
 
+// 一份 ChessMessage 多大 ?
 public class ChessMessage implements Serializable {
     private Object message;
     private Type type;
@@ -9,12 +10,18 @@ public class ChessMessage implements Serializable {
     private String receiver;
 
     public enum Type {
+        HEARTBEAT,
         LOGIN,
         ONLINE,
         OFFLINE,
         REGISTER,
         FORGET,
-        ACQUIRE_HALL_LIST,
+        ACQUIRE_LOBBY,
+        ACQUIRE_LOBBY_SUCCESS,
+        ACQUIRE_LOBBY_LIST,
+        ACQUIRE_LOBBY_LIST_SUCCESS,
+        ACQUIRE_GAME_ROOM,
+        ACQUIRE_GAME_ROOM_SUCCESS,
         FIGHT,
         MOVE,
         DRAW_ACTION,

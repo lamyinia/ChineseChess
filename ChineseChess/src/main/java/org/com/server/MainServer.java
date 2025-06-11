@@ -1,4 +1,4 @@
-package org.com.net;
+package org.com.server;
 
 import org.com.entity.User;
 import org.com.protocal.ChessMessage;
@@ -14,39 +14,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Vector;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainServer extends Server {
-    public class Client {
-        private User user;
-        private String ip;
-        private int port;
-        public Client(User user, String ip, int port) {
-            this.user = user;
-            this.ip = ip;
-            this.port = port;
-        }
-        public User getUser() {
-            return user;
-        }
-        public void setUser(User user) {
-            this.user = user;
-        }
-        public String getIp() {
-            return ip;
-        }
-        public void setIp(String ip) {
-            this.ip = ip;
-        }
-        public int getPort() {
-            return port;
-        }
-        public void setPort(int port) {
-            this.port = port;
-        }
-    }
+
     private static class GameThreadFactory implements ThreadFactory {
         private static final AtomicInteger poolNumber = new AtomicInteger(1);
         private final ThreadGroup group;
@@ -75,13 +47,15 @@ public class MainServer extends Server {
         }
     }
 
-
     private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
     private static final int MAX_POOL_SIZE = 50;
 
-    private ConcurrentHashMap<String, User> userTable = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Client> onlineTable = new ConcurrentHashMap<>();
+    private ConcurrentHashMap <String, User> userTable = new ConcurrentHashMap<>();
+    private ConcurrentHashMap <String, Boolean> onlineTable = new ConcurrentHashMap<>();
+
+    LobbyServer lobbyServer;
     private ConcurrentHashMap <String, GameServer> activeGames = new ConcurrentHashMap<>();
+
     private ExecutorService gameThreadPool;
 
     MainServer(int port) throws IOException {
@@ -96,6 +70,9 @@ public class MainServer extends Server {
                 new GameThreadFactory(), // 自定义线程工厂
                 new GameRejectedPolicy() // 自定义拒绝策略
         );
+        lobbyServer = new LobbyServer();
+        new Thread(lobbyServer).start();
+
         logger.info("主服务器的核心线程数量是{}，最大线程数量是{}", CORE_POOL_SIZE, MAX_POOL_SIZE);
 
         initPort(port);
@@ -129,18 +106,23 @@ public class MainServer extends Server {
             case LOGIN:
                 loginHandle(affair, message);
                 break;
-            case ONLINE:
-                onlineHandle(affair, message);
+            case ACQUIRE_LOBBY:
                 break;
-            case OFFLINE:
-                offlineHandle(message);
-                break;
-            case ACQUIRE_HALL_LIST:
-                HallListHandle();
-                break;
-            case FIGHT:
+            case ACQUIRE_GAME_ROOM:
                 openGameRoomHandle(affair, message);
                 break;
+//            case ONLINE:
+//                onlineHandle(affair, message);
+//                break;
+//            case OFFLINE:
+//                offlineHandle(message);
+//                break;
+//            case ACQUIRE_LOBBY_LIST:
+//                HallListHandle();
+//                break;
+//            case FIGHT:
+//                openGameRoomHandle(affair, message);
+//                break;
             default:
                 break;
         }
@@ -149,10 +131,7 @@ public class MainServer extends Server {
         logger.info("客户端登录请求处理");
 
         ChessMessage response = new ChessMessage();
-        Object[] objects = (Object[]) message.getMessage();
-        User user = (User) objects[0];
-        int affairPort = (int) objects[1];
-
+        User user = (User) message.getMessage();
         String account = user.getAccount();
 
         if (userTable.get(account) == null || !user.getPassword().equals(userTable.get(account).getPassword())){
@@ -162,77 +141,52 @@ public class MainServer extends Server {
             response.setMessage("改账号已经登录了");
             response.setType(ChessMessage.Type.FAILURE);
         } else {
-            onlineHandle(affair, message);
-            logger.info("上线用户、地址及端口" + account + " " + affair.getInetAddress().getHostAddress() + " " + affairPort);
+            onlineTable.put(account, true);
+            response.setMessage(lobbyServer.lobbyPort);
             response.setType(ChessMessage.Type.SUCCESS);
+            logger.info("上线用户:{}，ip 地址是 {}", account, affair.getInetAddress().getHostAddress());
         }
 
         try {
             SocketTool.sendMessage(affair, response);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            SocketTool.closeSocket(affair);
         }
     }
 
 
-    /**
-     * @param affair 根据 socket 找到它的 ip
-     * @param message 传 Object[User, 服务器的端口]
-     */
-    private void onlineHandle(Socket affair, ChessMessage message){
-        Object[] objects = (Object[]) message.getMessage();
-        User user = (User) objects[0];
-        int affairPort = (int) objects[1];
-        onlineTable.put(user.getAccount(), new Client(user, affair.getInetAddress().getHostAddress(), affairPort));
-    }
-    private void offlineHandle(ChessMessage message){
-        logger.info("下线请求处理");
-        String sender = message.getSender();
-        onlineTable.remove(sender);
-
-        HallListHandle();
-    }
+//    private void offlineHandle(ChessMessage message){
+//        logger.info("下线请求处理");
+//        String sender = message.getSender();
+//        onlineTable.remove(sender);
+//
+//        HallListHandle();
+//    }
 
     private void openGameRoomHandle(Socket affair, ChessMessage message){
-        logger.info("客户端房间请求处理");
+        logger.info("处理客户端房间请求");
 
-        String player1 = message.getSender();
-        String player2 = message.getReceiver();
-        Client client1 = onlineTable.get(player1);
-        Client client2 = onlineTable.get(player2);
+        boolean separation = System.currentTimeMillis()%2 == 1;
+        GameServer gameServer = new GameServer();
+
+        message.setMessage(new Object[]{gameServer.getGamePort(), separation});
+        message.setType(ChessMessage.Type.ACQUIRE_GAME_ROOM_SUCCESS);
 
         try {
-            boolean separation = System.currentTimeMillis()%2 == 1;  // true 时 player1 是红方
-            GameServer gameServer = new GameServer(client1, client2, separation);
-            message.setMessage(new Object[]{GameRoomTool.MAIN_SERVER_IP, gameServer.getGamePort(), separation});
-
-            new Sender(client2.getIp(), client2.getPort(), 1000).sendOnly(message);
-            SocketTool.sendMessage(affair, new ChessMessage(new Object[]{GameRoomTool.MAIN_SERVER_IP, gameServer.getGamePort(), !separation},
-                    ChessMessage.Type.SUCCESS, null, null));
-
-            gameThreadPool.submit(gameServer);
+            SocketTool.sendMessage(affair, message);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            SocketTool.closeSocket(affair);
         }
-    }
-    private void HallListHandle(){
-        logger.info("全局更新客户端的大厅在线用户");
-        Vector<String> items = new Vector<>();
-        onlineTable.forEach((u, _) -> items.add(u));
-        ChessMessage response = new ChessMessage(items, ChessMessage.Type.ACQUIRE_HALL_LIST, null, null);
-        onlineTable.forEach((account, client) -> {
-            try {
-//                logger.info("更新用户 " + account + " 的大厅列表");
-                new Sender(client.getIp(), client.getPort(), 1000).sendOnly(response);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
 
+        logger.info("游戏服务器已经创建，端口在: {}", gameServer.getGamePort());
+        gameThreadPool.submit(gameServer);
+    }
 
     public static void main(String[] args) throws IOException {
-        final int targetPort = 65140;
-        new MainServer(targetPort);
+        new MainServer(GameRoomTool.MAIN_SERVER_PORT);
     }
 }

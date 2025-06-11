@@ -1,5 +1,6 @@
-package org.com.views;
+package org.com.client.view;
 
+import org.com.client.callback.GameCallBack;
 import org.com.game.role.Chess;
 import org.com.game.state.GameRecord;
 import org.com.net.Sender;
@@ -10,14 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
+import java.awt.event.*;
 
 public class GameUI extends JFrame implements ActionListener {
     private static final Logger logger = LoggerFactory.getLogger(GameUI.class);
+    GameCallBack callBack;
 
     private String gameServerIp;
     private int gameServerPort;
@@ -30,13 +28,12 @@ public class GameUI extends JFrame implements ActionListener {
     JLabel hintLabel;
 
     /**
-     * 服务器ip，服务器端口，你的阵营，你是谁，你的对手是谁
+     * 你的阵营，你是谁，你的对手是谁
      */
-    public GameUI(String gameServerIp, int gameServerPort, boolean group, String currentPlayer, String opponentPlayer){
+    public GameUI(GameCallBack callBack, boolean group, String currentPlayer, String opponentPlayer){
+        this.callBack = callBack;
         logger.info("你是{}, 你在和 {} 在博弈象棋", currentPlayer, opponentPlayer);
-        setTitle("你是%s方，你的目的是击败%s方".formatted((!group ? "红" : "黑"), (!group ? "黑" : "红")));
-        this.gameServerIp = gameServerIp;
-        this.gameServerPort = gameServerPort;
+        setTitle("你是%s方的 %s，你的目的是击败%s方的 %s".formatted((!group ? "红" : "黑"), currentPlayer, (!group ? "黑" : "红"), opponentPlayer));
         this.group = group;
         this.currentPlayer = currentPlayer;
         this.opponentPlayer = opponentPlayer;
@@ -44,7 +41,18 @@ public class GameUI extends JFrame implements ActionListener {
         setLayout(new BorderLayout());
         setSize(1000, 850);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                logger.info("正在关闭窗口");
+                int result = JOptionPane.showConfirmDialog(null, "是否关闭窗口");
+                if (result == JOptionPane.YES_OPTION){
+                    callBack.exitGame();
+                    System.exit(0);
+                }
+            }
+        });
 
         decorateGamePanel();
         decorateFunctionPanel();
@@ -135,12 +143,9 @@ public class GameUI extends JFrame implements ActionListener {
         gamePanel.setSelectedChess(null);
         updateHintLabel();
 
-        try {
-            new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(record, ChessMessage.Type.MOVE,
+        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(record, ChessMessage.Type.MOVE,
                     currentPlayer, opponentPlayer));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
     }
     public void updateHintLabel(){
         hintLabel.setText(!gamePanel.getGameState().gameTurn.get() ? "红方回合" : "黑方回合");
@@ -202,55 +207,26 @@ public class GameUI extends JFrame implements ActionListener {
         return gamePanel.getGameState().gameTurn.get() == group;
     }
     private void handleRepealEvent(){
-        try {
-            new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                    ChessMessage.Type.REPEAL_REQUEST, currentPlayer, opponentPlayer));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                ChessMessage.Type.REPEAL_REQUEST, currentPlayer, opponentPlayer));
     }
     private void handleDrawEvent(){
-        try {
-            new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                    ChessMessage.Type.DRAW_REQUEST, currentPlayer, opponentPlayer));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                ChessMessage.Type.DRAW_REQUEST, currentPlayer, opponentPlayer));
     }
     private void handleGiveUpEvent(){
-        try {
-            new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
                     ChessMessage.Type.GIVE_UP, currentPlayer, opponentPlayer));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void confirmRepealRequest(){
-        int result = JOptionPane.showConfirmDialog(null, "对方请求悔棋，是否确定");
-        if (result == JOptionPane.YES_OPTION){
-            try {
-                new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                        ChessMessage.Type.REPEAL_ACTION, currentPlayer, opponentPlayer));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                ChessMessage.Type.REPEAL_ACTION, currentPlayer, opponentPlayer));
     }
     public void confirmDrawRequest(){
         int result = JOptionPane.showConfirmDialog(null, "对方求和，是否确定");
-        if (result == JOptionPane.YES_OPTION){
-            try {
-                new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
-                        ChessMessage.Type.DRAW_ACTION, currentPlayer, opponentPlayer));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        new Sender(gameServerIp, gameServerPort, 1000).sendOnly(new ChessMessage(null,
+                ChessMessage.Type.DRAW_ACTION, currentPlayer, opponentPlayer));
     }
-
-    public static void main(String[] args) {
-        new GameUI("1",1, false, "1", "2");
-    }
-
 }
+

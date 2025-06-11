@@ -1,4 +1,4 @@
-package org.com.net;
+package org.com.server;
 
 import org.com.protocal.ChessMessage;
 import org.com.tools.SocketTool;
@@ -20,7 +20,6 @@ public abstract class Server {
         HandleThread(Socket affair){
             this.affair = affair;
         }
-
         @Override
         public void run() {
             try {
@@ -39,12 +38,17 @@ public abstract class Server {
     public Server(){}
     protected abstract void handle(Socket affair, ChessMessage message);
 
-    protected void listen() throws IOException {
-        logger.info(serverName + ",端口在" + socket.getLocalPort() + " 开始监听");
+    protected void listen(){
+        logger.info(serverName + ", 端口在 " + socket.getLocalPort() + " 开始监听");
         running.set(true);
 
         while (running.get()){
-            Socket affair = socket.accept();
+            Socket affair = null;
+            try {
+                affair = socket.accept();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             new Thread(new HandleThread(affair)).start();
         }
     }
@@ -56,9 +60,8 @@ public abstract class Server {
             throw new RuntimeException(e);
         }
         handle(affair, message);
-        SocketTool.closeSocket(affair);
     }
-    int findFreeServerSocket(int i){
+    protected int findFreeServerSocket(int i){
         if (i >= 65536) return -1;
         try {
             socket = new ServerSocket(i);

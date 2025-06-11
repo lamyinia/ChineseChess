@@ -1,7 +1,6 @@
-package org.com.views;
+package org.com.client.view;
 
 import org.com.game.role.Chess;
-import org.com.game.role.ChessFactory;
 import org.com.game.state.GameRecord;
 import org.com.game.state.GameState;
 import org.com.tools.GameRoomTool;
@@ -14,9 +13,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 
 public class GamePanel extends JPanel {

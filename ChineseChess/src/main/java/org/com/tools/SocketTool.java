@@ -14,11 +14,7 @@ import java.net.Socket;
 public class SocketTool {
     private static final Logger logger = LoggerFactory.getLogger(SocketTool.class);
 
-    public static String showErrorBox(String message) {
-        JOptionPane.showMessageDialog(null, message, "错误", JOptionPane.ERROR_MESSAGE);
-        return message;
-    }
-
+    // static 会不会有并发的问题？
     public static void sendMessage(Socket socket, ChessMessage message) throws IOException {
         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
         output.writeObject(message);

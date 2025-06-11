@@ -16,6 +16,10 @@ public class GameRoomTool {
     public static final String VIEW_BASE_PATH = "files/img/";
     public static final String VIEW_CHESS_BOARD = VIEW_BASE_PATH + "ChessBoard.jpg";
     public static final String IMG_SUFFIX = ".jpg";
+    public static final int DEFAULT_FIND_PORT = 1025;
+    public static final int DEFAULT_SOCKET_TIMEOUT = 20000;
+    public static final int DEFAULT_HEARTBEAT_PERIOD = 8000;
+    public static final int DEFAULT_LOBBY_LIST_REQUEST_PERIOD = 5000;
 
     public static JButton createStyledButton(String text) {
         JButton button = new JButton(text);
