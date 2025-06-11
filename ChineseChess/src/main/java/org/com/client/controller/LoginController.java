@@ -1,6 +1,5 @@
 package org.com.client.controller;
 
-import org.com.client.Client;
 import org.com.client.callback.ConnectionCallBack;
 import org.com.client.callback.LoginCallBack;
 import org.com.client.view.LoginUI;

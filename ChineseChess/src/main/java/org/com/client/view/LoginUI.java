@@ -76,7 +76,8 @@ public class LoginUI extends JFrame implements ActionListener {
             return;
         }
 
-        new Thread(() -> callBack.loginEvent(account, password)).start();
+        callBack.loginEvent(account, password);
+//        new Thread(() -> callBack.loginEvent(account, password)).start();
     }
 
     private void register() {

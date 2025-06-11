@@ -3,7 +3,6 @@ package org.com.client.controller;
 import org.com.client.callback.ConnectionCallBack;
 import org.com.client.callback.LobbyCallBack;
 import org.com.client.view.LobbyUI;
-import org.com.entity.User;
 import org.com.net.PersistentConnectionToServer;
 import org.com.net.Sender;
 import org.com.protocal.ChessMessage;

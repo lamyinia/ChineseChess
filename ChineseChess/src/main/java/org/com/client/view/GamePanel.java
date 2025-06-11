@@ -11,7 +11,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 
@@ -25,9 +24,13 @@ public class GamePanel extends JPanel {
 
     public GamePanel() {
         try {
-            boardImage = ImageIO.read(new File(GameRoomTool.VIEW_CHESS_BOARD));
+            boardImage = ImageIO.read(GameRoomTool.VIEW_CHESS_BOARD);
         } catch (IOException e) {
             e.printStackTrace();
+            boardImage = new BufferedImage(800, 900, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = boardImage.createGraphics();
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(0, 0, 800, 900);
         }
     }
     public Chess getChessByXY(Point point){

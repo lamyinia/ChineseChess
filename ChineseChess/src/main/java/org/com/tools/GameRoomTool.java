@@ -6,21 +6,30 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 
 public class GameRoomTool {
-    public static final String MAIN_SERVER_IP = "127.0.0.1";
+    public static final String MAIN_SERVER_IP = "YOUR_SERVER_IP";
     public static final int MAIN_SERVER_PORT = 65140;
     public static final int SIZE = 80;
     public static final int MARGIN = 40;
     public static final int SPACE = 80;
-    public static final String VIEW_BASE_PATH = "files/img/";
-    public static final String VIEW_CHESS_BOARD = VIEW_BASE_PATH + "ChessBoard.jpg";
+//    public static final String VIEW_BASE_PATH = "files/img/";
+//    public static final String VIEW_CHESS_BOARD = VIEW_BASE_PATH + "ChessBoard.jpg";
+    public static final URL VIEW_BASE_PATH = GameRoomTool.class.getClassLoader().getResource("files/img/");
+    public static final URL VIEW_CHESS_BOARD = GameRoomTool.class.getClassLoader().getResource("files/img/ChessBoard.jpg");
+
     public static final String IMG_SUFFIX = ".jpg";
     public static final int DEFAULT_FIND_PORT = 1025;
     public static final int DEFAULT_SOCKET_TIMEOUT = 20000;
     public static final int DEFAULT_HEARTBEAT_PERIOD = 8000;
     public static final int DEFAULT_LOBBY_LIST_REQUEST_PERIOD = 5000;
 
+    public static URL getChessImage(boolean group, String name) {
+        return GameRoomTool.class.getClassLoader().getResource(
+                "files/img/" + (group ? "Black" : "Red") + name + IMG_SUFFIX
+        );
+    }
     public static JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("微软雅黑", Font.PLAIN, 14));

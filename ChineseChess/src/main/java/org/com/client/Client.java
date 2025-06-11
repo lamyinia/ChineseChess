@@ -5,6 +5,7 @@ import org.com.client.controller.GameController;
 import org.com.client.controller.LobbyController;
 import org.com.client.controller.LoginController;
 import org.com.entity.User;
+import org.com.log.LogViewer;
 import org.com.net.Sender;
 import org.com.protocal.ChessMessage;
 import org.com.tools.GameRoomTool;
@@ -26,6 +27,7 @@ public class Client implements ConnectionCallBack {
     private final Logger logger = LoggerFactory.getLogger(Client.class);
 
     private void startApp(){
+//        new LogViewer();
         loginController = new LoginController(this);
     }
 

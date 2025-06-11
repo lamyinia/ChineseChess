@@ -6,6 +6,7 @@ import org.com.tools.GameRoomTool;
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
+import java.net.URL;
 
 import static org.com.tools.GameRoomTool.SIZE;
 
@@ -64,9 +65,15 @@ public abstract class Chess implements Serializable {
     }
     public void drawChess(Graphics g, JPanel panel){
         getImageXY();
-        String path = GameRoomTool.VIEW_BASE_PATH + (group==false ? "Red" : "Black") + name + GameRoomTool.IMG_SUFFIX;
-        Image image = Toolkit.getDefaultToolkit().getImage(path);
-        g.drawImage(image, imgX, imgY, SIZE, SIZE, panel);
+        URL imageUrl = GameRoomTool.getChessImage(group, name);
+        if (imageUrl != null) {
+            Image image = Toolkit.getDefaultToolkit().getImage(imageUrl);
+            g.drawImage(image, imgX, imgY, SIZE, SIZE, panel);
+        } else {
+            // 处理加载失败情况
+            g.setColor(Color.RED);
+            g.fillOval(imgX, imgY, SIZE, SIZE);
+        }
     }
 
     public boolean isOverRiver(Point target){

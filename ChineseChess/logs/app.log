@@ -1,0 +1,109 @@
+2025-06-11 22:44:31.440 [AWT-EventQueue-0] INFO  org.com.client.view.LoginUI - LOGIN_CONFIRM命令
+2025-06-11 22:44:32.194 [Thread-1] INFO  o.c.c.c.LobbyController$LobbyConnection - 开始向服务器发送心跳
+2025-06-11 22:44:32.194 [Thread-1] INFO  o.c.c.c.LobbyController$LobbyConnection - 开始向服务器轮询大厅列表请求
+2025-06-11 22:44:32.397 [Thread-2] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:44:35.422 [Thread-3] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:44:40.423 [Thread-4] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:44:45.415 [Thread-5] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:44:50.069 [AWT-EventQueue-0] INFO  org.com.client.view.LoginUI - LOGIN_CONFIRM命令
+2025-06-11 22:44:50.366 [Thread-6] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:44:50.828 [Thread-1] INFO  o.c.c.c.LobbyController$LobbyConnection - 开始向服务器发送心跳
+2025-06-11 22:44:50.829 [Thread-1] INFO  o.c.c.c.LobbyController$LobbyConnection - 开始向服务器轮询大厅列表请求
+2025-06-11 22:44:51.012 [Thread-2] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:44:54.060 [Thread-3] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:44:55.449 [Thread-7] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:44:59.055 [Thread-4] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:00.364 [Thread-8] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:04.063 [Thread-5] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:05.367 [Thread-9] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:09.019 [Thread-6] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:10.425 [Thread-10] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:14.071 [Thread-7] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:15.374 [Thread-11] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:17.643 [AWT-EventQueue-0] INFO  org.com.client.view.LobbyUI - 双击1
+2025-06-11 22:45:17.993 [Thread-8] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是FIGHT的响应
+2025-06-11 22:45:18.350 [Thread-12] INFO  o.c.c.c.GameController$GameConnection - 开始向服务器发送心跳
+2025-06-11 22:45:18.351 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 你是a, 你在和 b 在博弈象棋
+2025-06-11 22:45:18.549 [Thread-9] INFO  o.c.c.c.GameController$GameConnection - 开始向服务器发送心跳
+2025-06-11 22:45:18.552 [Thread-8] INFO  org.com.client.view.GameUI - 你是b, 你在和 a 在博弈象棋
+2025-06-11 22:45:19.006 [Thread-10] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:20.387 [Thread-13] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:24.025 [Thread-11] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:25.418 [Thread-14] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:29.056 [Thread-12] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:30.371 [Thread-15] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:34.024 [Thread-13] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:35.426 [Thread-16] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:37.139 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 3，y 坐标是 6
+2025-06-11 22:45:37.316 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 3，y 坐标是 6
+2025-06-11 22:45:37.723 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 3，y 坐标是 6
+2025-06-11 22:45:39.053 [Thread-14] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:39.159 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 6
+2025-06-11 22:45:39.159 [AWT-EventQueue-0] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:45:39.338 [Thread-17] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:45:40.372 [Thread-18] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:41.048 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 6，y 坐标是 4
+2025-06-11 22:45:41.891 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 5，y 坐标是 4
+2025-06-11 22:45:41.900 [AWT-EventQueue-0] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:45:42.073 [Thread-15] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:45:43.027 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 6，y 坐标是 6
+2025-06-11 22:45:44.044 [Thread-16] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:45.366 [Thread-19] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:47.089 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 6
+2025-06-11 22:45:47.845 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 6
+2025-06-11 22:45:48.739 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 2，y 坐标是 7
+2025-06-11 22:45:49.013 [Thread-17] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:49.524 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 2，y 坐标是 4
+2025-06-11 22:45:49.524 [AWT-EventQueue-0] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:45:49.694 [Thread-20] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:45:50.418 [Thread-21] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:50.757 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 5，y 坐标是 4
+2025-06-11 22:45:53.328 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 4
+2025-06-11 22:45:53.340 [AWT-EventQueue-0] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:45:53.517 [Thread-18] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:45:54.059 [Thread-19] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:55.358 [Thread-22] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:56.398 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 6
+2025-06-11 22:45:56.534 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 6
+2025-06-11 22:45:56.995 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 6
+2025-06-11 22:45:59.002 [Thread-20] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:45:59.082 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 6
+2025-06-11 22:46:00.420 [Thread-23] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:00.533 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 3，y 坐标是 4
+2025-06-11 22:46:01.380 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 3，y 坐标是 2
+2025-06-11 22:46:02.541 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 3，y 坐标是 4
+2025-06-11 22:46:03.687 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 4，y 坐标是 4
+2025-06-11 22:46:03.699 [AWT-EventQueue-0] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:46:03.859 [Thread-24] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:46:04.004 [Thread-21] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:05.407 [Thread-25] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:06.197 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 7，y 坐标是 7
+2025-06-11 22:46:06.394 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 7，y 坐标是 7
+2025-06-11 22:46:06.780 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 7，y 坐标是 7
+2025-06-11 22:46:07.892 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 6，y 坐标是 7
+2025-06-11 22:46:07.895 [AWT-EventQueue-0] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:46:08.070 [Thread-22] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:46:09.058 [Thread-23] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:10.092 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 2，y 坐标是 4
+2025-06-11 22:46:10.299 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 2，y 坐标是 4
+2025-06-11 22:46:10.368 [Thread-26] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:10.690 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 2，y 坐标是 4
+2025-06-11 22:46:11.718 [AWT-EventQueue-0] INFO  org.com.client.view.GameUI - 点击的 x 坐标是 9，y 坐标是 4
+2025-06-11 22:46:11.732 [AWT-EventQueue-0] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:46:11.906 [Thread-27] INFO  org.com.client.view.GamePanel - 棋子将要移动
+2025-06-11 22:46:12.953 [Thread-24] INFO  o.c.c.c.GameController$GameConnection - 游戏结束
+2025-06-11 22:46:13.130 [Thread-24] INFO  o.c.c.c.GameController$GameConnection - 连接断开
+2025-06-11 22:46:14.000 [Thread-25] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:14.787 [Thread-28] INFO  o.c.c.c.GameController$GameConnection - 游戏结束
+2025-06-11 22:46:14.888 [Thread-28] INFO  o.c.c.c.GameController$GameConnection - 连接断开
+2025-06-11 22:46:15.356 [Thread-29] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:19.051 [Thread-26] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:20.371 [Thread-30] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:24.044 [Thread-27] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:25.360 [Thread-31] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:29.001 [Thread-28] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:30.423 [Thread-32] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:34.045 [Thread-29] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:35.371 [Thread-33] INFO  o.c.c.c.LobbyController$LobbyConnection - 收到类型是ACQUIRE_LOBBY_LIST_SUCCESS的响应
+2025-06-11 22:46:36.636 [AWT-EventQueue-0] INFO  o.c.c.c.LobbyController$LobbyConnection - 连接断开
+2025-06-11 22:46:39.960 [AWT-EventQueue-0] INFO  o.c.c.c.LobbyController$LobbyConnection - 连接断开

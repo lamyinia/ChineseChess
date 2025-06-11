@@ -36,6 +36,29 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.panteleyev</groupId>
+        <artifactId>jpackage-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <executions>
+          <execution>
+            <id>create-installer</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jpackage</goal>
+            </goals>
+            <configuration>
+              <name>ChineseChess</name>
+              <appVersion>1.0.0</appVersion>
+              <type>exe</type>
+              <winConsole>false</winConsole>
+              <winShortcut>true</winShortcut>
+              <winMenu>true</winMenu>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
@@ -44,6 +67,8 @@
         </configuration>
       </plugin>
     </plugins>
+
   </build>
+
 </project>
 
